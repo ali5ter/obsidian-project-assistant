@@ -1,0 +1,44 @@
+{
+  "name": "obsidian-project-assistant",
+  "version": "1.0.0",
+  "description": "Claude Code skill that automatically documents your technical projects in Obsidian",
+  "main": "scripts/install.js",
+  "bin": {
+    "obsidian-project-assistant": "./scripts/install.js"
+  },
+  "scripts": {
+    "test": "node test/bootstrap.test.js",
+    "install-skill": "node scripts/install.js"
+  },
+  "keywords": [
+    "obsidian",
+    "claude-code",
+    "documentation",
+    "projects",
+    "note-taking",
+    "pkm",
+    "knowledge-management",
+    "claude",
+    "ai-assistant"
+  ],
+  "author": "Alister",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/obsidian-project-assistant.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/obsidian-project-assistant/issues"
+  },
+  "homepage": "https://github.com/yourusername/obsidian-project-assistant#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "skills/",
+    "scripts/",
+    ".claude-plugin/",
+    "README.md",
+    "LICENSE"
+  ]
+}

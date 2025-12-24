@@ -1,0 +1,8 @@
+{
+  "name": "obsidian-project-assistant",
+  "description": "Documentation assistant for Obsidian vaults - automatically captures project progress, experiments, and insights",
+  "version": "1.0.0",
+  "author": {
+    "name": "Alister Lewis-Bowen"
+  }
+}

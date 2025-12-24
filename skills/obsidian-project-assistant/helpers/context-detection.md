@@ -7,6 +7,7 @@ This document provides detailed rules for detecting project context from the wor
 ### Priority 1: Explicit User Statement
 
 Look for phrases like:
+
 - "I'm working on [name]"
 - "This is my [name] project"
 - "Building a [name]"
@@ -27,16 +28,19 @@ basename $(git rev-parse --show-toplevel)
 ```
 
 **Transform to Title Case:**
+
 - `my-arduino-project` → "My Arduino Project"
 - `temperature_sensor` → "Temperature Sensor"
 - `synthesizer-build` → "Synthesizer Build"
 
 **Also check README.md first heading:**
+
 ```bash
 head -10 README.md | grep "^# " | sed 's/^# //'
 ```
 
 **Or package.json name/description:**
+
 ```bash
 cat package.json | grep -E '"name"|"description"'
 ```
@@ -69,23 +73,27 @@ If none of the above provide a clear name, or if multiple candidates exist, ask:
 ### Hardware
 
 **File Extensions:**
+
 - `.ino` - Arduino sketches
 - `.cpp`, `.h` - C++ (embedded context)
 - `.pcb` - PCB design files
 - `.sch` - Schematic files
 
 **Configuration Files:**
+
 - `platformio.ini` - PlatformIO projects
 - `arduino_secrets.h` - Arduino projects
 - `Makefile` (with avr-gcc, arm-none-eabi)
 
 **Keywords in files/directories:**
+
 - arduino, esp32, esp8266, teensy
 - circuit, pcb, schematic, breadboard
 - sensor, actuator, microcontroller
 - i2c, spi, uart, serial
 
 **Detection command:**
+
 ```bash
 find . -maxdepth 2 \( -name "*.ino" -o -name "platformio.ini" -o -name "*.pcb" \) 2>/dev/null
 ```
@@ -93,6 +101,7 @@ find . -maxdepth 2 \( -name "*.ino" -o -name "platformio.ini" -o -name "*.pcb" \
 ### Software
 
 **File Extensions:**
+
 - `.js`, `.ts` - JavaScript/TypeScript
 - `.py` - Python
 - `.go` - Go
@@ -102,6 +111,7 @@ find . -maxdepth 2 \( -name "*.ino" -o -name "platformio.ini" -o -name "*.pcb" \
 - `.php` - PHP
 
 **Configuration Files:**
+
 - `package.json` - Node.js projects
 - `requirements.txt`, `setup.py` - Python projects
 - `Cargo.toml` - Rust projects
@@ -109,11 +119,13 @@ find . -maxdepth 2 \( -name "*.ino" -o -name "platformio.ini" -o -name "*.pcb" \
 - `pom.xml`, `build.gradle` - Java projects
 
 **Keywords:**
+
 - api, backend, frontend, database
 - server, client, web, mobile
 - framework, library, npm, pip
 
 **Detection command:**
+
 ```bash
 find . -maxdepth 2 \( -name "package.json" -o -name "requirements.txt" -o -name "Cargo.toml" -o -name "*.py" -o -name "*.js" \) 2>/dev/null
 ```
@@ -121,6 +133,7 @@ find . -maxdepth 2 \( -name "package.json" -o -name "requirements.txt" -o -name 
 ### Woodworking
 
 **File Extensions:**
+
 - `.stl` - 3D model files
 - `.obj` - 3D object files
 - `.blend` - Blender files
@@ -128,11 +141,13 @@ find . -maxdepth 2 \( -name "package.json" -o -name "requirements.txt" -o -name 
 - `.skp` - SketchUp files
 
 **Documentation Files:**
+
 - `cut-list.md`, `cut-list.txt`
 - `materials.md`, `materials.txt`
 - `dimensions.md`
 
 **Keywords:**
+
 - joinery, dovetail, mortise, tenon
 - finish, stain, polyurethane
 - wood, lumber, hardwood, plywood
@@ -140,6 +155,7 @@ find . -maxdepth 2 \( -name "package.json" -o -name "requirements.txt" -o -name 
 - shop, workshop, woodshop
 
 **Detection command:**
+
 ```bash
 find . -maxdepth 2 \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" -o -name "cut-list.md" \) 2>/dev/null
 ```
@@ -147,6 +163,7 @@ find . -maxdepth 2 \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" -o -name
 ### Music Synthesis
 
 **File Extensions:**
+
 - `.pd` - Pure Data patches
 - `.maxpat` - Max/MSP patches
 - `.syx` - SysEx MIDI files
@@ -154,11 +171,13 @@ find . -maxdepth 2 \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" -o -name
 - `.amxd` - Ableton Max for Live devices
 
 **Documentation Files:**
+
 - `patch-notes.md`
 - `tuning-table.txt`
 - `modulation-matrix.md`
 
 **Keywords:**
+
 - oscillator, vco, vca, vcf
 - filter, envelope, lfo, modulation
 - modular, eurorack, synthesizer
@@ -166,6 +185,7 @@ find . -maxdepth 2 \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" -o -name
 - midi, synthesis, synth
 
 **Detection command:**
+
 ```bash
 find . -maxdepth 2 \( -name "*.pd" -o -name "*.maxpat" -o -name "*.syx" -o -name "patch-notes.md" \) 2>/dev/null
 ```
@@ -179,6 +199,7 @@ find . -maxdepth 2 \( -name "*.pd" -o -name "*.maxpat" -o -name "*.syx" -o -name
 5. If no clear winner or no matches, ask user to choose
 
 Example:
+
 ```bash
 HW=$(find . -maxdepth 2 \( -name "*.ino" -o -name "platformio.ini" \) 2>/dev/null | wc -l)
 SW=$(find . -maxdepth 2 \( -name "package.json" -o -name "*.py" -o -name "*.js" \) 2>/dev/null | wc -l)
@@ -217,6 +238,7 @@ cat package.json | grep '"description"' | sed 's/.*: "\(.*\)".*/\1/'
 ### From Conversation
 
 Look for user statements about:
+
 - "I'm building..."
 - "This project is for..."
 - "The goal is to..."
@@ -280,6 +302,7 @@ Projects/My Project.md
 ### Multi-Area Projects
 
 If project spans multiple areas (e.g., Hardware + Software for embedded project):
+
 - Ask user which area to classify under
 - Suggest creating separate notes if truly distinct
 - Default to primary area if obvious (hardware with software support → Hardware)
@@ -287,6 +310,7 @@ If project spans multiple areas (e.g., Hardware + Software for embedded project)
 ### Ambiguous Directory Names
 
 If directory name is generic (test, demo, project1):
+
 - Check parent directory
 - Check git repo name
 - Check README
@@ -299,6 +323,7 @@ Totally fine! Use directory name and continue normally.
 ### Nested Projects
 
 If in a subdirectory of a larger project:
+
 - Check if parent has .git
 - Ask user if this is a sub-project or independent project
 - Offer to create sub-project note or main project note

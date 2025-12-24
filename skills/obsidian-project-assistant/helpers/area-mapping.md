@@ -5,7 +5,7 @@ Quick reference for file extensions and patterns that indicate project areas.
 ## File Extension to Area Mapping
 
 | Extension | Area | Description |
-|-----------|------|-------------|
+| --------- | ---- | ----------- |
 | `.ino` | Hardware | Arduino sketch files |
 | `.cpp`, `.h` | Hardware* | C/C++ (embedded context) |
 | `.pcb` | Hardware | PCB design files |
@@ -33,7 +33,7 @@ Quick reference for file extensions and patterns that indicate project areas.
 ## Configuration File Mapping
 
 | File | Area | Description |
-|------|------|-------------|
+| ---- | ---- | ----------- |
 | `platformio.ini` | Hardware | PlatformIO configuration |
 | `arduino_secrets.h` | Hardware | Arduino secrets |
 | `package.json` | Software | Node.js package |
@@ -50,7 +50,8 @@ Quick reference for file extensions and patterns that indicate project areas.
 ## Keyword Indicators
 
 ### Hardware Keywords
-```
+
+```text
 arduino, esp32, esp8266, teensy, stm32
 circuit, pcb, schematic, breadboard
 sensor, actuator, microcontroller, mcu
@@ -60,7 +61,8 @@ voltage, current, resistor, capacitor
 ```
 
 ### Software Keywords
-```
+
+```text
 api, rest, graphql, endpoint
 backend, frontend, fullstack
 server, client, database, db
@@ -72,7 +74,8 @@ docker, kubernetes, container
 ```
 
 ### Woodworking Keywords
-```
+
+```text
 joinery, dovetail, mortise, tenon
 dado, rabbet, tongue, groove
 finish, stain, polyurethane, lacquer
@@ -84,7 +87,8 @@ clamp, chisel, plane, sandpaper
 ```
 
 ### Music Synthesis Keywords
-```
+
+```text
 oscillator, vco, vca, vcf, vca
 filter, lowpass, highpass, bandpass
 envelope, adsr, attack, decay, sustain, release
@@ -109,13 +113,17 @@ When multiple areas match:
 ## Special Cases
 
 ### Embedded Software (Hardware + Software)
+
 If both hardware and software indicators present:
+
 - Check for microcontroller keywords (arduino, esp32, etc.) → Hardware
 - Check for web/api keywords → Software
 - When in doubt, ask user to choose primary area
 
 ### 3D Printing Projects
+
 `.stl`, `.gcode` files could be:
+
 - Woodworking (jigs, fixtures, furniture parts)
 - Hardware (enclosures, brackets, mechanical parts)
 - Music Synthesis (eurorack panels, knobs)
@@ -123,7 +131,9 @@ If both hardware and software indicators present:
 Check context and ask user if needed.
 
 ### CAD/Design Projects
+
 `.blend`, `.f3d`, `.skp` files could be:
+
 - Woodworking (furniture design)
 - Hardware (enclosure design)
 - General 3D modeling
@@ -152,6 +162,7 @@ If user has custom areas, ask them to classify or provide detection rules.
 ## Future Enhancements
 
 Potential improvements for area detection:
+
 - Machine learning classification based on file content
 - User training: remember classifications for similar projects
 - Directory path patterns (~/arduino-projects → Hardware)

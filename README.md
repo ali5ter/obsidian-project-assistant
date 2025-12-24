@@ -11,7 +11,7 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 ## Features
 
 - 🤖 **Auto-documents projects** - Captures progress as you work with Claude Code
-- 📁 **Organized by area** - Classifies projects as Hardware, Software, Woodworking, or Music Synthesis
+- 📁 **Organized by area** - Classifies projects including Hardware, Software, Woodworking, or Music Synthesis
 - 🔬 **Experiment logging** - Records experiments with hypothesis, observations, and conclusions
 - 🔗 **Smart linking** - Automatically links related notes and projects
 - 📝 **Template-based** - Uses consistent, customizable templates
@@ -30,6 +30,7 @@ npx obsidian-project-assistant init ~/Documents/MyVault
 ```
 
 This will:
+
 - Create the vault folder structure
 - Install note templates
 - Set up the Claude Code skill
@@ -45,6 +46,7 @@ npx obsidian-project-assistant install
 ```
 
 This will:
+
 - Create a backup of affected files
 - Add missing folders and templates
 - Install the skill
@@ -61,11 +63,12 @@ claude
 
 Then in conversation:
 
-```
+```text
 User: "I'm building an Arduino temperature sensor. Let's document this project."
 ```
 
 The skill will:
+
 1. Detect it's a hardware project (from `.ino` files)
 2. Extract the project name ("Arduino Temperature Sensor")
 3. Create a project note in your vault
@@ -74,17 +77,20 @@ The skill will:
 ### Other Commands
 
 **Update existing project:**
-```
+
+```text
 "I just got the I2C communication working. Update my project notes."
 ```
 
 **Log an experiment:**
-```
+
+```text
 "Log this experiment - I tested three different capacitor values for filtering."
 ```
 
 **Ask about the vault:**
-```
+
+```text
 "Show me my recent projects"
 "What's in my Hardware area?"
 ```
@@ -105,7 +111,7 @@ The skill intelligently detects project context:
 
 ### Vault Structure
 
-```
+```text
 ObsidianVault/
 ├── Projects/              # Individual project notes
 ├── Areas/
@@ -122,6 +128,7 @@ ObsidianVault/
 ### Note Templates
 
 **Project Notes** include:
+
 - Overview and goals
 - Resources and materials
 - Progress log with timestamps
@@ -129,6 +136,7 @@ ObsidianVault/
 - Links to related projects
 
 **Experiment Notes** include:
+
 - Hypothesis and goals
 - Setup and procedure
 - Observations and data
@@ -149,6 +157,7 @@ The skill is configured in `~/.claude/skills/obsidian-project-assistant/config.j
 ```
 
 **Options:**
+
 - `vault_path` - Absolute path to your Obsidian vault
 - `areas` - List of project areas (customize as needed)
 - `auto_commit` - Auto-commit changes without asking (default: false)
@@ -170,7 +179,7 @@ cd ~/projects/esp32-weather-station
 claude
 ```
 
-```
+```text
 User: "I'm building a weather station with ESP32. Document this project."
 
 Claude: [Detects Hardware project, creates note at Projects/ESP32 Weather Station.md]
@@ -183,7 +192,7 @@ cd ~/code/rest-api
 claude
 ```
 
-```
+```text
 User: "This is a REST API for user management. Let's track this."
 
 Claude: [Detects Software project from package.json, creates project note]
@@ -191,7 +200,7 @@ Claude: [Detects Software project from package.json, creates project note]
 
 ### Experiment Logging
 
-```
+```text
 User: "I tested the DHT22 sensor at different sampling rates. Log this experiment."
 
 Claude: [Creates experiment note with observations, links to parent project]
@@ -218,6 +227,7 @@ Edit `~/.claude/skills/obsidian-project-assistant/config.json`:
 ### Custom Templates
 
 Templates are in your vault's `Templates/` folder. Edit them to match your workflow:
+
 - `Project Template.md`
 - `Experiment Template.md`
 - `Daily Note Template.md`
@@ -225,15 +235,18 @@ Templates are in your vault's `Templates/` folder. Edit them to match your workf
 ## Troubleshooting
 
 **Skill not activating:**
+
 - Check that `~/.claude/skills/obsidian-project-assistant/` exists
 - Verify config.json has correct vault_path
 - Restart Claude Code
 
 **Wrong area detected:**
+
 - Specify area in conversation: "This is a hardware project"
 - Update config.json with project directory mappings
 
 **Git commits failing:**
+
 - Ensure git is installed and vault is a git repo
 - Set `git_enabled: false` to disable git integration
 
@@ -242,6 +255,7 @@ Templates are in your vault's `Templates/` folder. Edit them to match your workf
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **Ideas for contributions:**
+
 - New project area templates
 - Improved context detection
 - Additional file pattern mappings

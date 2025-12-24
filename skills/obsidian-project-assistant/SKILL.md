@@ -12,6 +12,7 @@ This skill helps maintain project documentation in an Obsidian vault while worki
 ## How This Works
 
 When activated, this skill:
+
 1. Detects the current project context (name, area, type)
 2. Creates or updates notes in the configured Obsidian vault
 3. Maintains consistent formatting using templates
@@ -26,6 +27,7 @@ cat ~/.claude/skills/obsidian-project-assistant/config.json
 ```
 
 Expected format:
+
 ```json
 {
   "vault_path": "/path/to/ObsidianVault",
@@ -42,14 +44,18 @@ If config doesn't exist, ask user for vault path and create it.
 ### 1. Detect Project Name
 
 **Priority order:**
+
 1. **Explicit user statement** - User says "working on [project name]"
 2. **Git repository** - Check if cwd is a git repo:
+
    ```bash
    git rev-parse --is-inside-work-tree 2>/dev/null && basename $(git rev-parse --show-toplevel)
    ```
+
    Transform kebab-case → Title Case (e.g., "my-project" → "My Project")
 
 3. **Directory name** - Current directory or parent if current is generic (src/, build/, etc.):
+
    ```bash
    basename $(pwd)
    ```
@@ -75,6 +81,7 @@ find . -maxdepth 2 -type f \( -name "*.pd" -o -name "*.maxpat" -o -name "*.syx" 
 ```
 
 **Classification:**
+
 - Hardware: .ino, .cpp (Arduino/embedded), platformio.ini, .pcb, .sch
 - Software: .js, .ts, .py, .go, .rs, package.json, requirements.txt
 - Woodworking: .stl, .obj, .blend, .f3d (CAD files)
@@ -85,6 +92,7 @@ If multiple matches or unclear, ask user to confirm area.
 ### 3. Extract Description from Conversation
 
 Parse the conversation for project description:
+
 - Look for user statements about what they're building
 - Extract from README.md if it exists
 - Use package.json description field if available
@@ -117,6 +125,7 @@ cat ~/.claude/skills/obsidian-project-assistant/templates/project-template.md
 ### Step 3: Fill Template Placeholders
 
 Replace placeholders with detected values:
+
 - `{{title}}` → Detected project name
 - `{{date}}` → Current date in YYYY-MM-DD format (use `date +%Y-%m-%d`)
 - `{{area}}` → Detected area
@@ -128,18 +137,22 @@ Replace placeholders with detected values:
 Write complete template to vault location.
 
 **If existing project:**
+
 - Preserve existing content
 - Append to Progress Log section:
+
   ```markdown
   ### YYYY-MM-DD
   [Summary of today's work from conversation]
   ```
+
 - Update `updated:` field in frontmatter
 
 ### Step 5: Confirm Creation
 
 Tell user:
-```
+
+```text
 Created/updated project note: ~/Documents/ObsidianVault/Projects/[Project Name].md
 ```
 
@@ -181,7 +194,8 @@ git rev-parse --git-dir > /dev/null 2>&1
 ### Step 2: Ask Before Committing
 
 Unless `auto_commit` is true, ask user:
-```
+
+```text
 Would you like me to commit these changes to the vault?
 - Yes, commit the changes
 - No, just leave them uncommitted
@@ -207,6 +221,7 @@ git commit -m "Update [Project Name] project notes
 **User:** "I'm building an Arduino temperature sensor. Can you help document this project?"
 
 **Actions:**
+
 1. Detect project name: "Arduino Temperature Sensor" (from conversation)
 2. Detect area: Hardware (find .ino files in cwd)
 3. Load project template
@@ -219,13 +234,16 @@ git commit -m "Update [Project Name] project notes
 **User:** "I just got the I2C communication working. Update my project notes."
 
 **Actions:**
+
 1. Detect current project (from cwd or recent context)
 2. Read existing project note
 3. Append to Progress Log:
+
    ```markdown
    ### 2025-12-23
    Successfully implemented I2C communication for sensor readings.
    ```
+
 4. Update `updated:` frontmatter field
 5. Ask about git commit
 
@@ -234,6 +252,7 @@ git commit -m "Update [Project Name] project notes
 **User:** "Log this experiment - I tested three different capacitor values for filtering"
 
 **Actions:**
+
 1. Load experiment template
 2. Fill with conversation details:
    - Hypothesis: Testing capacitor values for noise filtering
@@ -245,6 +264,7 @@ git commit -m "Update [Project Name] project notes
 ## Helper References
 
 For detailed context detection rules, see:
+
 - `helpers/context-detection.md` - Full detection logic
 - `helpers/area-mapping.md` - Complete file extension mappings
 

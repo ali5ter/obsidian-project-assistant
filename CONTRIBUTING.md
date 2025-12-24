@@ -85,6 +85,7 @@ npm test
 ```
 
 **Test checklist:**
+
 - [ ] New vault creation works
 - [ ] Existing vault installation works
 - [ ] Context detection works for your changes
@@ -95,7 +96,7 @@ npm test
 
 Use clear, descriptive commit messages:
 
-```
+```text
 Good:
 - "Add support for Rust project detection"
 - "Fix template placeholder replacement"
@@ -174,6 +175,7 @@ The skill uses file patterns to detect project types. To improve detection:
 ### Manual Testing
 
 **Test Scenario 1: New Vault**
+
 ```bash
 # Create test vault
 node scripts/install.js init ~/test-vault-1
@@ -186,6 +188,7 @@ node scripts/install.js init ~/test-vault-1
 ```
 
 **Test Scenario 2: Existing Vault**
+
 ```bash
 # Create mock vault
 mkdir ~/test-vault-2/.obsidian
@@ -201,6 +204,7 @@ node scripts/install.js install
 ```
 
 **Test Scenario 3: Context Detection**
+
 ```bash
 # Create test projects
 mkdir ~/test-projects/my-arduino-project
@@ -228,6 +232,7 @@ test('Should detect Python projects as Software', () => {
 ```
 
 Run with:
+
 ```bash
 npm test
 ```
@@ -237,6 +242,7 @@ npm test
 ### README Updates
 
 When adding features, update README.md:
+
 - Add to Features section
 - Add usage example
 - Update configuration section if needed
@@ -244,12 +250,14 @@ When adding features, update README.md:
 ### SKILL.md Updates
 
 The SKILL.md file is the instruction manual for Claude. Update it when:
+
 - Adding new capabilities
 - Changing behavior
 - Adding new templates
 - Modifying context detection
 
 Keep instructions:
+
 - Clear and specific
 - With concrete examples
 - Focused on what Claude should do
@@ -257,6 +265,7 @@ Keep instructions:
 ## Release Process
 
 Maintainers will:
+
 1. Review and merge pull requests
 2. Update version in package.json
 3. Update CHANGELOG.md
@@ -279,6 +288,7 @@ Maintainers will:
 ## Recognition
 
 Contributors will be recognized in:
+
 - GitHub contributors list
 - Release notes for significant contributions
 - README acknowledgments (for major features)

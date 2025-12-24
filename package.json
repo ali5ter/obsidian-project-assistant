@@ -21,16 +21,16 @@
     "claude",
     "ai-assistant"
   ],
-  "author": "Alister",
+  "author": "Alister Lewis-Bowen",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/obsidian-project-assistant.git"
+    "url": "https://github.com/ali5ter/obsidian-project-assistant.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/obsidian-project-assistant/issues"
+    "url": "https://github.com/ali5ter/obsidian-project-assistant/issues"
   },
-  "homepage": "https://github.com/yourusername/obsidian-project-assistant#readme",
+  "homepage": "https://github.com/ali5ter/obsidian-project-assistant#readme",
   "engines": {
     "node": ">=16.0.0"
   },

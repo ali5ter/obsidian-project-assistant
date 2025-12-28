@@ -22,12 +22,23 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 
 ## Installation
 
+> **Note:** This package is not yet published to npm. Use the GitHub installation method below until it's available on npm.
+
 ### New Vault
 
 Create a new Obsidian vault with the recommended structure:
 
 ```bash
-npx obsidian-project-assistant init ~/Documents/MyVault
+# Install directly from GitHub
+npx github:ali5ter/obsidian-project-assistant init ~/Documents/MyVault
+```
+
+**Or clone and run locally:**
+
+```bash
+git clone https://github.com/ali5ter/obsidian-project-assistant.git
+cd obsidian-project-assistant
+node scripts/install.js init ~/Documents/MyVault
 ```
 
 This will:
@@ -42,8 +53,17 @@ This will:
 Add to an existing Obsidian vault:
 
 ```bash
+# Install directly from GitHub
 cd ~/Documents/ExistingVault
-npx obsidian-project-assistant install
+npx github:ali5ter/obsidian-project-assistant install
+```
+
+**Or clone and run locally:**
+
+```bash
+git clone https://github.com/ali5ter/obsidian-project-assistant.git
+cd obsidian-project-assistant
+node scripts/install.js install
 ```
 
 This will:
@@ -52,6 +72,16 @@ This will:
 - Add missing folders and templates
 - Install the skill
 - Preserve all existing content
+
+### Once Published to npm
+
+After publication, the simpler command will work:
+
+```bash
+npx obsidian-project-assistant init ~/Documents/MyVault
+# or
+npx obsidian-project-assistant install
+```
 
 ## Usage
 

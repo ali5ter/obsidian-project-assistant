@@ -16,7 +16,8 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 - 🔗 **Smart linking** - Automatically links related notes and projects
 - 📝 **Template-based** - Uses consistent, customizable templates
 - 🎯 **Context-aware** - Infers project details from your working directory
-- 🔄 **Git integration** - Optionally commits changes to your vault repository
+- 🔄 **Git integration** - Optionally commits and pushes changes to your vault repository
+- 🚀 **Auto-backup** - Automatically push to remote GitHub repo for seamless backup
 - 🌍 **Cross-project** - Works from any directory, updates central vault
 
 ## Installation
@@ -152,6 +153,7 @@ The skill is configured in `~/.claude/skills/obsidian-project-assistant/config.j
   "vault_path": "/Users/you/Documents/ObsidianVault",
   "areas": ["Hardware", "Software", "Woodworking", "Music Synthesis"],
   "auto_commit": false,
+  "auto_push": false,
   "git_enabled": true
 }
 ```
@@ -161,6 +163,7 @@ The skill is configured in `~/.claude/skills/obsidian-project-assistant/config.j
 - `vault_path` - Absolute path to your Obsidian vault
 - `areas` - List of project areas (customize as needed)
 - `auto_commit` - Auto-commit changes without asking (default: false)
+- `auto_push` - Auto-push commits to remote repository (default: false)
 - `git_enabled` - Enable git integration (default: true)
 
 ## Requirements

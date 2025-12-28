@@ -19,7 +19,11 @@
     "pkm",
     "knowledge-management",
     "claude",
-    "ai-assistant"
+    "ai-assistant",
+    "agent-based",
+    "async",
+    "background-processing",
+    "automation"
   ],
   "author": "Alister Lewis-Bowen",
   "license": "MIT",

@@ -98,6 +98,8 @@ The skill will:
 
 ## How It Works
 
+The skill uses an efficient, non-blocking architecture that works in the background. When you invoke it, the skill quickly detects your project context, asks any needed questions upfront, then handles the documentation work asynchronously. This means you can keep working while your notes are being updated and synced.
+
 ### Context Detection
 
 The skill intelligently detects project context:

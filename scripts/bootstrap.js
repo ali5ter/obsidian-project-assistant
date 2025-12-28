@@ -261,6 +261,7 @@ async function installSkill(vaultPath) {
     vault_path: vaultPath,
     areas: ['Hardware', 'Software', 'Woodworking', 'Music Synthesis'],
     auto_commit: false,
+    auto_push: false,
     git_enabled: true
   };
 

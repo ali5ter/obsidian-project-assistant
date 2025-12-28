@@ -128,8 +128,10 @@ obsidian-project-assistant/
 - Date generated via `date +%Y-%m-%d` bash command
 
 ### Git Integration
-- Optional: controlled by `config.json` fields `git_enabled` and `auto_commit`
+- Optional: controlled by `config.json` fields `git_enabled`, `auto_commit`, and `auto_push`
 - Skill checks if vault is git repo before attempting commits
+- If `auto_push` is true, automatically pushes to remote after committing
+- If `auto_push` is false, asks user before pushing
 - Commits include attribution: "Generated with the help of Claude Code Obsidian Project Documentation Assistant"
 
 ## Development Practices

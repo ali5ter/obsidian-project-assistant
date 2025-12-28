@@ -33,6 +33,7 @@ Expected format:
   "vault_path": "/path/to/ObsidianVault",
   "areas": ["Hardware", "Software", "Woodworking", "Music Synthesis"],
   "auto_commit": false,
+  "auto_push": false,
   "git_enabled": true
 }
 ```
@@ -213,6 +214,37 @@ git commit -m "Update [Project Name] project notes
 
 🤖 Generated with the help of Claude Code Obsidian Project Documentation Assistant"
 ```
+
+### Step 4: Push to Remote
+
+After committing, check if remote is configured and push if `auto_push` is enabled:
+
+```bash
+cd $VAULT_PATH
+
+# Check if remote exists
+if git remote | grep -q 'origin'; then
+  # If auto_push is true, push automatically
+  # Otherwise ask user
+  if [ "$AUTO_PUSH" = "true" ]; then
+    git push origin HEAD
+    echo "Pushed changes to remote"
+  else
+    # Ask user if they want to push
+    echo "Changes committed. Would you like to push to remote?"
+  fi
+else
+  echo "No remote configured, skipping push"
+fi
+```
+
+**Implementation:**
+
+- Check config `auto_push` value
+- If `auto_push` is true, push automatically after successful commit
+- If `auto_push` is false, ask user: "Push changes to remote? (Y/n)"
+- Only push if remote exists (use `git remote` to check)
+- Handle push failures gracefully (remote may require authentication)
 
 ## Usage Examples
 

@@ -46,20 +46,23 @@ When testing skill changes:
    - Generates `config.json` with vault path
 
 2. **Skill Implementation** (`skills/obsidian-project-assistant/`)
-   - `SKILL.md` - **Main skill logic** - instructions Claude reads to execute the skill
+   - `SKILL.md` - **Lightweight launcher** - detects context and spawns agent
    - `templates/*.md` - Note templates with `{{placeholder}}` syntax
    - `helpers/*.md` - Reference documentation for context detection rules
    - `config.json` - Generated during installation, contains vault_path
 
-### Execution Flow
+### Execution Flow (Agent-Based Architecture v1.1.0+)
 
 When user says "document this project":
-1. Claude Code loads `SKILL.md` (the skill's instruction manual)
-2. Skill reads `config.json` to get vault path
-3. Skill runs bash commands to detect project context (name from git/directory, area from file extensions)
-4. Skill loads appropriate template, fills placeholders
-5. Skill writes/updates note in vault at `$VAULT_PATH/Projects/[Project Name].md`
-6. Optionally commits to git if vault is a repo
+1. Claude Code loads `SKILL.md` (the launcher)
+2. Launcher reads `config.json` to get vault path
+3. Launcher runs quick bash commands to detect project context (name from git/directory, area from file extensions)
+4. If context is unclear, launcher asks user questions using AskUserQuestion tool
+5. Launcher spawns a general-purpose agent using the Task tool with complete context
+6. Agent loads appropriate template, fills placeholders
+7. Agent writes/updates note in vault at `$VAULT_PATH/Projects/[Project Name].md`
+8. Agent commits and optionally pushes to git if configured
+9. Agent returns summary to launcher, which reports to user
 
 ### Context Detection Strategy
 
@@ -106,7 +109,12 @@ obsidian-project-assistant/
 └── package.json                        # NPM package configuration
 ```
 
-**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code - it's a detailed instruction manual that tells Claude what bash commands to run, what files to read, and how to process information.
+**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code - it's a lightweight launcher that:
+1. Detects project context using bash commands
+2. Asks clarifying questions if needed (using AskUserQuestion tool)
+3. Spawns a background agent (using Task tool) to handle the actual documentation work
+
+This two-phase architecture (launcher + agent) provides token efficiency and background execution.
 
 ## Key Implementation Details
 
@@ -118,8 +126,42 @@ obsidian-project-assistant/
 
 ### Skill Invocation
 - Activated by keywords in user messages: "document this", "log experiment", "track progress", "update notes"
-- Allowed tools: Read, Write, Bash, Glob, Grep (defined in SKILL.md frontmatter)
+- Launcher allowed tools: Read, Bash, AskUserQuestion, Task (defined in SKILL.md frontmatter)
+- Agent has access to all tools needed for documentation (Read, Write, Bash, etc.)
 - Must work from any directory (uses absolute vault paths from config)
+- Background execution: Agent runs asynchronously, doesn't block main conversation
+
+### Agent-Based Architecture (v1.1.0+)
+
+The skill uses a two-phase architecture for token efficiency and background execution:
+
+**Phase 1: Launcher (SKILL.md)**
+- Loads configuration from `config.json`
+- Detects project context (name, area, description) using bash commands
+- Asks clarifying questions if context is ambiguous (AskUserQuestion tool)
+- Prepares agent prompt with complete context
+- Spawns agent using Task tool with subagent_type="general-purpose"
+
+**Phase 2: Agent (Background)**
+- Receives complete context and instructions from launcher
+- Loads appropriate template based on task type
+- Creates or updates notes in vault
+- Handles git operations (commit, push) based on config
+- Returns summary of operations performed
+
+**Benefits:**
+- **Token Efficiency**: Launcher is ~200 lines vs ~800 lines in previous monolithic approach
+- **Background Execution**: Agent runs asynchronously, user can continue working
+- **Separation of Concerns**: Context detection separate from documentation work
+- **Better UX**: Questions asked upfront, then work happens transparently
+- **Scalability**: Easy to add new documentation types without bloating launcher
+
+**Agent Prompt Structure:**
+- Context variables (vault path, project name, area, dates, config settings)
+- Task-specific instructions (create vs update, project vs experiment)
+- Git operation rules based on config
+- Template paths and placeholder mappings
+- Expected output format
 
 ### Template Processing
 - Templates are first copied to vault's Templates/ folder (with spaces: "Project Template.md")

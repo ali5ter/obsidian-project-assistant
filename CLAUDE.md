@@ -4,32 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code skill that automatically documents technical projects in Obsidian vaults. It's distributed as an NPM package that installs skill files to `~/.claude/skills/obsidian-project-assistant/` and creates/updates notes in a user's Obsidian vault.
+This is a Claude Code skill that automatically documents technical projects in Obsidian vaults. It's distributed via git repository with a bash installer that copies skill files to `~/.claude/skills/obsidian-project-documentation-assistant/` and an agent file to `~/.claude/agents/`, enabling automatic documentation of projects in a user's Obsidian vault.
 
-**Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and maintain structured Obsidian notes during conversations.
+**Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
 ## Commands
 
-### Build and Test
+### Installation
 ```bash
-# Run tests
-npm test
+# Clone the repository
+git clone https://github.com/ali5ter/obsidian-project-assistant.git
+cd obsidian-project-assistant
 
-# Install skill locally for testing (creates new vault)
-node scripts/install.js init ~/test-vault
+# Install to a vault (creates vault if needed)
+./install ~/Documents/MyVault
 
-# Install to existing vault
-cd ~/your-vault
-node scripts/install.js install
-
-# Or via npx (as end users would)
-npx obsidian-project-assistant init ~/Documents/MyVault
+# Or install from current directory (if you're already in your vault)
+cd ~/Documents/MyVault
+/path/to/obsidian-project-assistant/install
 ```
 
 ### Development Workflow
 When testing skill changes:
-1. Edit files in `skills/obsidian-project-assistant/`
-2. Reinstall to test vault: `node scripts/install.js init ~/test-vault`
+1. Edit files in `skill/obsidian-project-documentation-assistant/` or `agent/obsidian-project-documentation-manager.md`
+2. Reinstall to test vault: `./install ~/test-vault`
 3. Start Claude Code in a test project directory
 4. Trigger the skill with phrases like "document this project"
 5. Verify notes are created/updated in the test vault
@@ -38,28 +36,30 @@ When testing skill changes:
 
 ### Two-Part System
 
-1. **Installation Scripts** (`scripts/`)
-   - `install.js` - CLI entry point, parses args and calls bootstrap functions
-   - `bootstrap.js` - Core installation logic for vault setup and skill installation
-   - Copies skill files to `~/.claude/skills/obsidian-project-assistant/`
-   - Creates vault directory structure (Projects/, Areas/, Templates/, etc.)
-   - Generates `config.json` with vault path
+1. **Installation** (`install` bash script)
+   - Single bash script that handles all installation logic
+   - Uses `pfb` library (submodule at `lib/pfb/`) for UI/formatting
+   - Copies skill files from `skill/` to `~/.claude/skills/obsidian-project-documentation-assistant/`
+   - Copies agent file from `agent/` to `~/.claude/agents/`
+   - Generates `config.json` with vault path at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
+   - Optionally initializes git repository in vault
 
-2. **Skill Implementation** (`skills/obsidian-project-assistant/`)
-   - `SKILL.md` - **Lightweight launcher** - detects context and spawns agent
-   - `templates/*.md` - Note templates with `{{placeholder}}` syntax
-   - `helpers/*.md` - Reference documentation for context detection rules
-   - `config.json` - Generated during installation, contains vault_path
+2. **Skill + Agent Implementation**
+   - **Skill** (`skill/obsidian-project-documentation-assistant/SKILL.md`) - Lightweight launcher that detects context and spawns agent
+   - **Agent** (`agent/obsidian-project-documentation-manager.md`) - Does the actual documentation work
+   - **Templates** (`skill/obsidian-project-documentation-assistant/project-template.md`) - Note template with `{{placeholder}}` syntax
+   - **Helpers** (`skill/obsidian-project-documentation-assistant/*.md`) - Reference documentation for context detection rules (area-mapping.md, context-detection.md)
+   - **Config** - Generated during installation at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
 
-### Execution Flow (Agent-Based Architecture v1.1.0+)
+### Execution Flow (Agent-Based Architecture)
 
 When user says "document this project":
-1. Claude Code loads `SKILL.md` (the launcher)
+1. Claude Code loads `SKILL.md` (the launcher skill)
 2. Launcher reads `config.json` to get vault path
 3. Launcher runs quick bash commands to detect project context (name from git/directory, area from file extensions)
 4. If context is unclear, launcher asks user questions using AskUserQuestion tool
-5. Launcher spawns a general-purpose agent using the Task tool with complete context
-6. Agent loads appropriate template, fills placeholders
+5. Launcher spawns the custom "obsidian-project-documentation-manager" agent using the Task tool with complete context
+6. Agent (running in background) loads appropriate template, fills placeholders
 7. Agent writes/updates note in vault at `$VAULT_PATH/Projects/[Project Name].md`
 8. Agent commits and optionally pushes to git if configured
 9. Agent returns summary to launcher, which reports to user
@@ -72,7 +72,7 @@ The skill uses file patterns and bash commands to infer project metadata:
 - **Area Classification**: File extension presence (`.ino` → Hardware, `.js` → Software, `.stl` → Woodworking, `.pd` → Music Synthesis)
 - **Description**: Extract from README.md, package.json, or conversation
 
-See `skills/obsidian-project-assistant/helpers/context-detection.md` for complete detection rules.
+See `skill/obsidian-project-documentation-assistant/context-detection.md` for complete detection rules.
 
 ### Template System
 
@@ -88,41 +88,43 @@ When updating existing notes, the skill appends to the Progress Log section whil
 
 ```
 obsidian-project-assistant/
-├── skills/
-│   └── obsidian-project-assistant/    # Skill implementation (copied to ~/.claude/skills/)
-│       ├── SKILL.md                    # CRITICAL: Claude's instruction manual
-│       ├── templates/                  # Note templates (also copied to vault)
-│       │   ├── project-template.md
-│       │   ├── experiment-template.md
-│       │   └── daily-note-template.md
-│       └── helpers/                    # Reference docs for SKILL.md
-│           ├── context-detection.md    # Detection algorithm details
-│           └── area-mapping.md         # File extension mappings
-├── scripts/
-│   ├── install.js                      # CLI entry point
-│   └── bootstrap.js                    # Installation logic
-├── test/
-│   ├── bootstrap.test.js               # Simple test suite
-│   └── fixtures/                       # Test data
-├── .claude-plugin/
-│   └── plugin.json                     # NPM package metadata
-└── package.json                        # NPM package configuration
+├── skill/
+│   └── obsidian-project-documentation-assistant/  # Skill files (copied to ~/.claude/skills/)
+│       ├── SKILL.md                               # CRITICAL: Launcher that detects context
+│       ├── project-template.md                    # Project note template
+│       ├── context-detection.md                   # Detection algorithm details
+│       └── area-mapping.md                        # File extension mappings
+├── agent/
+│   └── obsidian-project-documentation-manager.md  # Agent that does documentation work (copied to ~/.claude/agents/)
+├── lib/
+│   └── pfb/                                       # Pretty Formatting for Bash (submodule)
+├── install                                        # Bash installation script
+├── CLAUDE.md                                      # This file - AI context
+├── README.md                                      # User documentation
+└── LICENSE                                        # MIT License
 ```
 
 **Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code - it's a lightweight launcher that:
 1. Detects project context using bash commands
 2. Asks clarifying questions if needed (using AskUserQuestion tool)
-3. Spawns a background agent (using Task tool) to handle the actual documentation work
+3. Spawns the custom "obsidian-project-documentation-manager" agent (using Task tool) to handle the actual documentation work
 
-This two-phase architecture (launcher + agent) provides token efficiency and background execution.
+The agent file `obsidian-project-documentation-manager.md` contains detailed instructions for creating/updating notes, handling git operations, and managing templates.
+
+This two-phase architecture (launcher skill + custom agent) provides token efficiency and background execution.
 
 ## Key Implementation Details
 
 ### Installation Architecture
-- `bootstrap.js` exports two functions: `init()` for new vaults, `install()` for existing vaults
-- Both create the skill directory structure and copy files
-- `init()` creates full vault structure, `install()` only adds missing pieces
-- Configuration is stored at `~/.claude/skills/obsidian-project-assistant/config.json`
+- `install` is a bash script that handles all installation
+- Uses `pfb` library (Pretty Formatting for Bash) for UI elements via git submodule
+- Takes vault path as argument (defaults to current directory)
+- Copies skill directory to `~/.claude/skills/obsidian-project-documentation-assistant/`
+- Copies agent file to `~/.claude/agents/obsidian-project-documentation-manager.md`
+- Generates `config.json` at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
+- Checks if vault exists and is initialized by Obsidian (looks for `.obsidian/` directory)
+- Optionally initializes git repository in vault if not present
+- Updates `git_enabled` config based on user choices
 
 ### Skill Invocation
 - Activated by keywords in user messages: "document this", "log experiment", "track progress", "update notes"
@@ -140,7 +142,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Detects project context (name, area, description) using bash commands
 - Asks clarifying questions if context is ambiguous (AskUserQuestion tool)
 - Prepares agent prompt with complete context
-- Spawns agent using Task tool with subagent_type="general-purpose"
+- Spawns custom agent using Task tool with subagent_type="obsidian-project-documentation-manager"
 
 **Phase 2: Agent (Background)**
 - Receives complete context and instructions from launcher
@@ -164,10 +166,10 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Expected output format
 
 ### Template Processing
-- Templates are first copied to vault's Templates/ folder (with spaces: "Project Template.md")
-- Skill reads from `~/.claude/skills/obsidian-project-assistant/templates/` (kebab-case names)
-- String replacement for placeholders (simple substitution)
+- Template is stored at `~/.claude/skills/obsidian-project-documentation-assistant/project-template.md`
+- Agent reads template and performs string replacement for placeholders (simple substitution)
 - Date generated via `date +%Y-%m-%d` bash command
+- Placeholders: `{{title}}`, `{{area}}`, `{{date}}`, `{{description}}`
 
 ### Git Integration
 - Optional: controlled by `config.json` fields `git_enabled`, `auto_commit`, and `auto_push`
@@ -186,50 +188,53 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Remember: this file is instruction text, not executable code
 
 ### When Adding New Area Types
-1. Add file extensions to `helpers/area-mapping.md`
-2. Add detection bash commands to `helpers/context-detection.md`
-3. Update SKILL.md detection section
-4. Add area to default config in `bootstrap.js` (line 262)
-5. Create test fixture in `test/fixtures/`
+1. Add file extensions to `skill/obsidian-project-documentation-assistant/area-mapping.md`
+2. Add detection bash commands to `skill/obsidian-project-documentation-assistant/context-detection.md`
+3. Update `skill/obsidian-project-documentation-assistant/SKILL.md` detection section
+4. Add area to default config in `install` script (around line 63-64)
+5. Test manually with a project containing those file types
 
 ### When Modifying Templates
 - Keep `{{placeholder}}` syntax consistent
-- Templates in `skills/obsidian-project-assistant/templates/` use kebab-case names
-- When copied to vault, they get title-cased with spaces
+- Template is at `skill/obsidian-project-documentation-assistant/project-template.md`
 - Maintain frontmatter format (YAML between `---` markers)
+- Agent performs direct string replacement, so placeholders must match exactly
 
 ### Testing Strategy
-- `npm test` runs basic structural tests (file existence, placeholder presence)
 - Manual testing required for skill behavior (run Claude Code in test projects)
-- Test fixtures in `test/fixtures/` simulate different project types
-- Always test with a fresh test vault to avoid state contamination
+- Create test projects with different file types to verify area detection
+- Test with a dedicated test vault to avoid contaminating production notes
+- Verify git operations work correctly (commit, push) with test vault
 
 ## Common Tasks
 
 ### Adding a New Project Area (e.g., "Photography")
 
-1. Update `skills/obsidian-project-assistant/helpers/area-mapping.md` with file extensions
-2. Update `skills/obsidian-project-assistant/helpers/context-detection.md` with detection command
-3. Update `skills/obsidian-project-assistant/SKILL.md` detection section
-4. Add "Photography" to default areas in `scripts/bootstrap.js:262`
-5. Create test fixture: `test/fixtures/photography-project/` with sample files
+1. Update `skill/obsidian-project-documentation-assistant/area-mapping.md` with file extensions
+2. Update `skill/obsidian-project-documentation-assistant/context-detection.md` with detection command
+3. Update `skill/obsidian-project-documentation-assistant/SKILL.md` detection section
+4. Add "Photography" to default areas in `install` script (around line 63)
+5. Test with a sample photography project containing relevant file types (.raw, .jpg, etc.)
 
 ### Debugging Skill Behavior
 
-1. Check skill is installed: `ls ~/.claude/skills/obsidian-project-assistant/`
-2. Verify config: `cat ~/.claude/skills/obsidian-project-assistant/config.json`
-3. Test context detection manually: `cd test-project && git rev-parse --show-toplevel`
-4. Review SKILL.md to understand what Claude should be doing
-5. Check vault permissions: `ls -la ~/path/to/vault/Projects/`
+1. Check skill is installed: `ls ~/.claude/skills/obsidian-project-documentation-assistant/`
+2. Check agent is installed: `ls ~/.claude/agents/obsidian-project-documentation-manager.md`
+3. Verify config: `cat ~/.claude/skills/obsidian-project-documentation-assistant/config.json`
+4. Test context detection manually: `cd test-project && git rev-parse --show-toplevel`
+5. Review SKILL.md to understand launcher behavior
+6. Review agent file to understand documentation logic
+7. Check vault permissions: `ls -la ~/path/to/vault/Projects/`
 
 ### Publishing Updates
 
-1. Update version in `package.json`
-2. Update version in `skills/obsidian-project-assistant/SKILL.md` frontmatter
-3. Update version in `.claude-plugin/plugin.json`
-4. Run `npm test` to verify
-5. Create git tag: `git tag v1.x.x`
-6. Publish: `npm publish`
+1. Update version in `skill/obsidian-project-documentation-assistant/SKILL.md` frontmatter
+2. Update CHANGELOG.md (if it exists) with changes
+3. Test installation with `./install ~/test-vault`
+4. Verify skill and agent work correctly
+5. Commit changes: `git commit -am "Version bump and changes"`
+6. Create git tag: `git tag v1.x.x`
+7. Push to GitHub: `git push origin main --tags`
 
 ## Important Notes
 
@@ -237,5 +242,6 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - The skill must be robust to being invoked from any directory (always use absolute paths)
 - Error handling should gracefully ask users for clarification rather than failing silently
 - Preserve user content when updating existing notes (only append to designated sections)
-- Config file location: `~/.claude/skills/obsidian-project-assistant/config.json` (not in vault)
+- Config file location: `~/.claude/skills/obsidian-project-documentation-assistant/config.json` (not in vault)
+- Agent file location: `~/.claude/agents/obsidian-project-documentation-manager.md`
 - Template placeholder format is strict: `{{key}}` with double braces, no spaces

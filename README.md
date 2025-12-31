@@ -1,6 +1,6 @@
 # Obsidian Project Documentation Manager
 
-A Claude Code skill that automatically triggers an agent to documents your technical projects in Obsidian as you work.
+A Claude Code skill that automatically triggers an agent to document your technical projects in Obsidian as you work.
 
 ## What is it?
 
@@ -176,10 +176,10 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- [GitHub](https://github.com/yourusername/obsidian-project-assistant)
-- [Issues](https://github.com/yourusername/obsidian-project-assistant/issues)
+- [GitHub](https://github.com/ali5ter/obsidian-project-assistant)
+- [Issues](https://github.com/ali5ter/obsidian-project-assistant/issues)
 - [Claude Code](https://code.claude.com)
-- [Obsidian**](https://obsidian.md)
+- [Obsidian](https://obsidian.md)
 
 ---
 

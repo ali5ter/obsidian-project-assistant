@@ -180,6 +180,31 @@ The skill uses a two-phase architecture for token efficiency and background exec
 
 ## Development Practices
 
+### Agent Reliability Improvements (v2.1.0 - 2025-12-31)
+
+The agent was significantly improved to ensure reliable execution of all documentation steps, especially when documenting the tool itself (meta-documentation scenario):
+
+**Key Improvements:**
+- **TodoWrite Tracking**: Agent now creates a visible task list with all 7 steps at the start of execution
+- **Meta-Documentation Awareness**: Special handling when working directory contains "obsidian-project-assistant"
+  - Detects self-documentation scenarios
+  - Ensures BOTH vault note AND repository's CLAUDE.md are updated
+  - Step 4 is explicitly marked as CRITICAL with validation requirements
+- **Structured Reporting**: Step 7 requires reporting completion status for ALL steps with explicit explanations for any skipped steps
+- **Error Handling Protocol**: Agent must STOP and report errors clearly instead of silently skipping steps
+- **Step Validation**: After critical steps (especially CLAUDE.md updates), agent re-reads files to verify changes were written correctly
+
+**Testing Approach:**
+- The 2025-12-31 session served as the critical test case
+- Previous session (2025-12-30 refactoring) had failed to update CLAUDE.md
+- Improvements were tested by triggering agent with "Let's wrap up this session"
+- Verified all 7 steps execute correctly including CLAUDE.md updates
+
+**Known Issues Fixed:**
+- Step numbering inconsistency (was 1,3-8, corrected to 1-7)
+- Silent failures when updating repository documentation
+- Missing TodoWrite visibility for users
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable

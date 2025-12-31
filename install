@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+
+# @file install
+# @brief Installation script for Obsidian Project Documention skill/agent for Claude Code.
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILL_SOURCE="$SCRIPT_DIR/skill/obsidian-project-documentation-assistant/"
+SKILL_DEST="$HOME/.claude/skills/obsidian-project-documentation-assistant/"
+AGENT_SOURCE="$SCRIPT_DIR/agent/obsidian-project-documentation-manager.md"
+AGENT_DEST="$HOME/.claude/agents/"
+
+source_pfb() {
+    if [ ! -f "$SCRIPT_DIR/lib/pfb/pfb.sh" ]; then
+        echo "Initializing pfb submodule..."
+        cd "$SCRIPT_DIR" || exit
+        git submodule update --init --recursive
+    fi
+    # shellcheck disable=SC1091
+    source "$SCRIPT_DIR/lib/pfb/pfb.sh"
+}
+
+usage() {
+    pfb heading "Obsidian Project Documentation skill and agent installation script" "🗂️"
+    echo ""
+    pfb subheading "Usage:"
+    echo "  $0 [vault-path]"
+    echo ""
+    pfb subheading "Examples:"
+    echo "  $0 ~/Documents/MyVault"
+    echo "  cd ~/Documents/MyVault && ${SCRIPT_DIR}/$0"
+    exit 1
+}
+
+expand_path() {
+    echo "${1/#\~/$HOME}"
+}
+
+install_skill() {
+    local vault_path="$1"
+
+    pfb heading "Installing skill" "🎯"
+
+    mkdir -p "$HOME/.claude/skills"
+    if [ -d "$SKILL_DEST" ]; then
+        pfb warn "Skill already exists, updating..."
+        for file in "$SKILL_SOURCE"/*; do
+            rm -rf "${SKILL_DEST}$(basename "$file")"
+        done
+    fi
+    mkdir -p "$SKILL_DEST"
+    cp -R "$SKILL_SOURCE"/* "$SKILL_DEST"
+    pfb success "Skill installed to $SKILL_DEST"
+
+    pfb heading "Installing skill configuration" "⚙️"
+
+    if [ -f "${SKILL_DEST}config.json" ]; then
+        pfb info "Configuration already exists at ${SKILL_DEST}config.json"
+    else
+        cat > "${SKILL_DEST}config.json" <<EOF
+{
+  "vault_path": "$vault_path",
+  "areas": ["Hardware", "Software", "Woodworking", "Music Synthesis"],
+  "auto_commit": false,
+  "auto_push": false,
+  "git_enabled": true
+}
+EOF
+        pfb success "Configuration created at ${SKILL_DEST}config.json"
+    fi
+
+    echo ""
+
+    pfb subheading "Obsidian Document Assistant skill files:"
+    echo "${DIM}$(ls -la "$SKILL_DEST")${RESET}"
+    echo ""
+    pfb subheading "Current Skill Configuration:"
+    echo "${DIM}$(cat "${SKILL_DEST}config.json")${RESET}"
+
+    echo ""
+}
+
+install_agent() {
+    pfb heading "Installing agent" "🤖"
+
+    if [ -f "$AGENT_DEST/obsidian-project-documentation-manager.md" ]; then
+        pfb warn "Agent already exists, updating..."
+        rm -rf "$AGENT_DEST/obsidian-project-documentation-manager.md"
+    fi
+    mkdir -p "$HOME/.claude/agents"
+    cp -R "$AGENT_SOURCE" "$AGENT_DEST"
+    pfb success "Agent installed to $AGENT_DEST"
+
+    echo ""
+
+    pfb subheading "Installed personal Claude Agents:"
+    echo "${DIM}$(ls -l "${AGENT_DEST}")${RESET}"
+
+    echo ""
+}
+
+git_enabled_in_config() {
+    if grep "\"git_enabled\": true" "$SKILL_DEST/config.json" > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+set_git_enabled_in_config() {
+    local bool="$1"
+    if [ "$bool" = true ]; then
+        sed -i.bak 's/"git_enabled": false/"git_enabled": true/' "$SKILL_DEST/config.json"
+    else
+        sed -i.bak 's/"git_enabled": true/"git_enabled": false/' "$SKILL_DEST/config.json"
+    fi
+    rm "$SKILL_DEST/config.json.bak"
+}
+
+check_vault() {
+    # shellcheck disable=SC2155
+    local vault_path=$(expand_path "$1")
+
+    pfb heading "Checking Obsidian Vault" "📂"
+
+    if [ -d "$vault_path" ]; then
+        pfb info "Path exists: $vault_path"
+    else
+        pfb warning "Path does not exist: $vault_path"
+        pfb subheading "Check you provided the correct path."
+        pfb subheading "If the path is correct, remember to create the Vault directory at this path."
+        echo ""
+        exit 1
+    fi
+
+    if [ -d "$vault_path/.obsidian" ]; then
+        pfb info "Obsidian vault detected at: $vault_path"
+    else
+        pfb warning "The Obsidian Vault path exists but has not been initialized by Obsidian yet."
+    fi
+
+    if [ -d "$vault_path/.git" ]; then
+        pfb info "Git repository detected in vault."
+        if git_enabled_in_config; then
+            pfb success "Git is enabled in the skill configuration."
+        else
+            pfb warning "Git repository exists but git_enabled is not set to true in the skill configuration."
+            pfb subheading "Please update the skill configuration at $SKILL_DEST/config.json to enable Git."
+        fi
+    else
+        pfb info "No Git repository detected in vault."
+        if pfb confirm "Would you like to initialize a new Git repository here? (y/n)"; then
+            pfb info "Initializing Git repository in vault..."
+            git init "$vault_path"
+            git -C "$vault_path" branch -M main
+            git -C "$vault_path" add .
+            git -C "$vault_path" commit -m "Initial commit"
+            echo ""
+            pfb success "Initialized a new Git repository in the vault."
+            pfb subheading "Make sure to set up a remote repository and push your changes."
+            if git_enabled_in_config; then
+                pfb success "Git is already enabled in the skill configuration."
+            else
+                pfb info "Enabling Git in the skill configuration..."
+                set_git_enabled_in_config true
+                pfb success "Git enabled in the skill configuration."
+            fi
+        else
+            pfb warning "Skipping Git repository initialization."
+            if git_enabled_in_config; then
+                pfb info "Disabling Git in the skill configuration..."
+                set_git_enabled_in_config false
+                pfb success "Git disabled in the skill configuration."
+            else
+                pfb info "Git remains disabled in the skill configuration."
+            fi
+        fi
+    fi
+
+    echo ""
+
+    pfb heading "Next steps..." "🚀"
+    pfb subheading  "1. Open $vault_path in Obsidian"
+    if git_enabled_in_config; then
+        pfb subheading  "   - Make sure to set up remote repository 'origin' if you haven't already."
+        pfb subheading  "   - Make sure to push your initial commit to the remote repository."
+    fi
+    pfb subheading  "2. Start working on a project with Claude Code"
+    pfb subheading  "3. Say 'document this project'"
+    echo ""
+}
+
+vault_path="${1:-$(pwd)}"
+source_pfb
+install_skill "$vault_path"
+install_agent
+check_vault "$vault_path"

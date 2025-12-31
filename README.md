@@ -1,10 +1,10 @@
-# Obsidian Project Documentation Assistant
+# Obsidian Project Documentation Manager
 
-A Claude Code skill that automatically documents your technical projects in Obsidian as you work.
+A Claude Code skill that automatically triggers an agent to documents your technical projects in Obsidian as you work.
 
 ## What is it?
 
-As you work on projects with Claude Code, this skill captures your progress, experiments, and insights into a structured Obsidian vault. No more forgetting what you tried, why you made certain decisions, or what worked and what didn't.
+As you work on projects with Claude Code, this skill and agent captures your progress and insights into a structured Obsidian vault. No more forgetting what you tried, why you made certain decisions, or what worked and what didn't.
 
 Perfect for makers, engineers, and tinkerers who work across multiple technical domains.
 
@@ -12,7 +12,6 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 
 - 🤖 **Auto-documents projects** - Captures progress as you work with Claude Code
 - 📁 **Organized by area** - Classifies projects including Hardware, Software, Woodworking, or Music Synthesis
-- 🔬 **Experiment logging** - Records experiments with hypothesis, observations, and conclusions
 - 🔗 **Smart linking** - Automatically links related notes and projects
 - 📝 **Template-based** - Uses consistent, customizable templates
 - 🎯 **Context-aware** - Infers project details from your working directory
@@ -22,66 +21,20 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 
 ## Installation
 
-> **Note:** This package is not yet published to npm. Use the GitHub installation method below until it's available on npm.
-
-### New Vault
-
-Create a new Obsidian vault with the recommended structure:
-
-```bash
-# Install directly from GitHub
-npx github:ali5ter/obsidian-project-assistant init ~/Documents/MyVault
-```
-
-**Or clone and run locally:**
+Clone the repository and run the installer:
 
 ```bash
 git clone https://github.com/ali5ter/obsidian-project-assistant.git
 cd obsidian-project-assistant
-node scripts/install.js init ~/Documents/MyVault
+./install ~/Documents/MyVault
 ```
 
 This will:
 
-- Create the vault folder structure
+- Check if the Obsidian Vault directory exists
 - Install note templates
-- Set up the Claude Code skill
+- Set up the Claude Code skill and agent
 - Optionally initialize a git repository
-
-### Existing Vault
-
-Add to an existing Obsidian vault:
-
-```bash
-# Install directly from GitHub
-cd ~/Documents/ExistingVault
-npx github:ali5ter/obsidian-project-assistant install
-```
-
-**Or clone and run locally:**
-
-```bash
-git clone https://github.com/ali5ter/obsidian-project-assistant.git
-cd obsidian-project-assistant
-node scripts/install.js install
-```
-
-This will:
-
-- Create a backup of affected files
-- Add missing folders and templates
-- Install the skill
-- Preserve all existing content
-
-### Once Published to npm
-
-After publication, the simpler command will work:
-
-```bash
-npx obsidian-project-assistant init ~/Documents/MyVault
-# or
-npx obsidian-project-assistant install
-```
 
 ## Usage
 
@@ -92,43 +45,44 @@ cd ~/projects/arduino-temperature-sensor
 claude
 ```
 
-Then in conversation:
+Then in conversation trigger the skill use a prompt like this example:
 
 ```text
-User: "I'm building an Arduino temperature sensor. Let's document this project."
+I am building an Arduino based time machine. Let's document this project."
 ```
 
 The skill will:
 
 1. Detect it's a hardware project (from `.ino` files)
-2. Extract the project name ("Arduino Temperature Sensor")
-3. Create a project note in your vault
+2. Extract the project name ("Arduino Time Machine")
+3. Create a project note in your Obsidian vault
 4. Track your progress as you work
 
-### Other Commands
+### Examples of other prompts
 
-**Update existing project:**
-
-```text
-"I just got the I2C communication working. Update my project notes."
-```
-
-**Log an experiment:**
+Update existing project:
 
 ```text
-"Log this experiment - I tested three different capacitor values for filtering."
+I just got the I2C communication working. Update my project notes.
 ```
 
-**Ask about the vault:**
+Exiting a working session with Claude Code:
+
+```text
+Ok I'm tired. Let's wrap it up for today.
+```
+
+Ask about the vault:
 
 ```text
 "Show me my recent projects"
+or 
 "What's in my Hardware area?"
 ```
 
 ## How It Works
 
-The skill uses an efficient, non-blocking architecture that works in the background. When you invoke it, the skill quickly detects your project context, asks any needed questions upfront, then handles the documentation work asynchronously. This means you can keep working while your notes are being updated and synced.
+The skill uses an efficient, non-blocking architecture that works in the background. It does this by using the Obsidian Project Documentation Assistant skill to detect your project context, asks any questions upfront, then triggers the Obsidian Project Documentation Manager agent which handles the documentation work asynchronously. This means you can keep working while your notes are being updated and synced.
 
 ### Context Detection
 
@@ -144,41 +98,11 @@ The skill intelligently detects project context:
 
 ### Vault Structure
 
-```text
-ObsidianVault/
-├── Projects/              # Individual project notes
-├── Areas/
-│   ├── Hardware/
-│   ├── Software/
-│   ├── Woodworking/
-│   └── Music Synthesis/
-├── Resources/             # Reference materials
-├── Templates/             # Note templates
-├── Daily/                 # Daily work logs
-└── Archive/               # Completed projects
-```
-
-### Note Templates
-
-**Project Notes** include:
-
-- Overview and goals
-- Resources and materials
-- Progress log with timestamps
-- Observations and outcomes
-- Links to related projects
-
-**Experiment Notes** include:
-
-- Hypothesis and goals
-- Setup and procedure
-- Observations and data
-- Analysis and conclusions
-- Link to parent project
+Any project notes will be placed into a `Projects` directory in your Obsidian Vault folder. If you already use a Vault, no other folders will be touched. If you already use a Project folder in your existing Obsidian Vault, unless a notes file using the same name the Obsidian Project Documentation Manager agent wants to use, there will be no changes to existing content. If, conicidentally, there is a file with the name the Obsidian Project Documentation Manager agent wants to use, project updates will be appended to it.
 
 ## Configuration
 
-The skill is configured in `~/.claude/skills/obsidian-project-assistant/config.json`:
+The skill is configured in `~/.claude/skills/obsidian-project-documentation-assistant/config.json`:
 
 ```json
 {
@@ -200,52 +124,15 @@ The skill is configured in `~/.claude/skills/obsidian-project-assistant/config.j
 
 ## Requirements
 
-- **Node.js** >= 16.0.0 (for installation)
 - **Claude Code** - The official Claude CLI
-- **Obsidian** (optional, for viewing notes)
-- **Git** (optional, for version control)
-
-## Examples
-
-### Hardware Project
-
-```bash
-cd ~/projects/esp32-weather-station
-claude
-```
-
-```text
-User: "I'm building a weather station with ESP32. Document this project."
-
-Claude: [Detects Hardware project, creates note at Projects/ESP32 Weather Station.md]
-```
-
-### Software Project
-
-```bash
-cd ~/code/rest-api
-claude
-```
-
-```text
-User: "This is a REST API for user management. Let's track this."
-
-Claude: [Detects Software project from package.json, creates project note]
-```
-
-### Experiment Logging
-
-```text
-User: "I tested the DHT22 sensor at different sampling rates. Log this experiment."
-
-Claude: [Creates experiment note with observations, links to parent project]
-```
+- **Obsidian** - For viewing your notes - you can view the markdown notes files without Obsidian of course
+- **Git** - If you version control your vault content in a private remote git repository (recommended)
 
 ## Customization
 
 ### Custom Areas
 
-Edit `~/.claude/skills/obsidian-project-assistant/config.json`:
+Edit `~/.claude/skills/obsidian-project-documentation-assistant/config.json`:
 
 ```json
 {
@@ -259,19 +146,17 @@ Edit `~/.claude/skills/obsidian-project-assistant/config.json`:
 }
 ```
 
-### Custom Templates
+Update the `~/.claude/skills/obsidian-project-documentation-assistant/area-mapping.md` and `~/.claude/skills/obsidian-project-documentation-assistant/context-detection.md` definitions to help detect the custom area.
 
-Templates are in your vault's `Templates/` folder. Edit them to match your workflow:
+### Custom Template
 
-- `Project Template.md`
-- `Experiment Template.md`
-- `Daily Note Template.md`
+The project note template used by the agent is located at `~/.claude/skills/obsidian-project-documentation-assistant/project-template.md`. You can edit this file directly to customize the structure and content of your project notes.
 
 ## Troubleshooting
 
 **Skill not activating:**
 
-- Check that `~/.claude/skills/obsidian-project-assistant/` exists
+- Check that `~/.claude/skills/obsidian-project-documentation-assistant/` exists
 - Verify config.json has correct vault_path
 - Restart Claude Code
 
@@ -285,35 +170,17 @@ Templates are in your vault's `Templates/` folder. Edit them to match your workf
 - Ensure git is installed and vault is a git repo
 - Set `git_enabled: false` to disable git integration
 
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-**Ideas for contributions:**
-
-- New project area templates
-- Improved context detection
-- Additional file pattern mappings
-- Translations
-- Bug fixes
-
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## Credits
-
-Created by [Alister Lewis-Bowen](https://github.com/alisterlewis)
-
-Built with [Claude Code](https://code.claude.com) - the official Claude CLI.
-
 ## Links
 
-- **GitHub**: https://github.com/yourusername/obsidian-project-assistant
-- **Issues**: https://github.com/yourusername/obsidian-project-assistant/issues
-- **Claude Code**: https://code.claude.com
-- **Obsidian**: https://obsidian.md
+- [GitHub](https://github.com/yourusername/obsidian-project-assistant)
+- [Issues](https://github.com/yourusername/obsidian-project-assistant/issues)
+- [Claude Code](https://code.claude.com)
+- [Obsidian**](https://obsidian.md)
 
 ---
 
-**Made with ❤️ for makers, tinkerers, and technical explorers**
+Made with ❤️ for makers, tinkerers, and technical explorers

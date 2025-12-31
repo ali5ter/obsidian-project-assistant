@@ -1,38 +1,3 @@
-# Node modules
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Test fixtures and outputs
-test/fixtures/test-vault/
-test/fixtures/.backup/
-*.test-output
-
-# macOS
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Editor directories and files
-.vscode/
-.idea/
 *.swp
-*.swo
 *~
-
-# Environment files
-.env
-.env.local
-
-# Build outputs
-dist/
-build/
-
-# Coverage
-coverage/
-.nyc_output/
-
-# Temporary files
-*.tmp
-.backup/

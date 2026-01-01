@@ -27,6 +27,7 @@ Quick reference for file extensions and patterns that indicate project areas.
 | `.syx` | Music Synthesis | SysEx MIDI file |
 | `.fxp` | Music Synthesis | VST preset |
 | `.amxd` | Music Synthesis | Ableton M4L device |
+| `.sh` | Software | Shell |
 
 *Note: `.cpp` and `.h` can be Software or Hardware depending on context. Check for embedded indicators.
 

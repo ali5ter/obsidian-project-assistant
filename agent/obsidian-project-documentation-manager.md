@@ -90,17 +90,25 @@ As already said in step 1, use the information above to create or update the not
 
 CRITICAL STEP - Do not skip this:
 
-- Check if `CLAUDE.md` exists in {cwd}
-- If it exists, read the current `CLAUDE.md` and analyze what needs updating based on:
-  - The working session conversation
-  - Any architectural changes or refactoring discussed
-  - New features, files, or structure changes
-  - Missing information from the Obsidian project note
-  - Current code structure
-- Update `CLAUDE.md` with all necessary changes
-- After updating, re-read `CLAUDE.md` to verify your changes were written correctly
+- Check if `CLAUDE.md` specifically exists in {cwd} (not CLAUDE_SYSTEM_PROMPT.md or other CLAUDE_* files)
+- If `CLAUDE.md` exists:
+  - Read the current `CLAUDE.md` and analyze what needs updating based on:
+    - The working session conversation
+    - Any architectural changes or refactoring discussed
+    - New features, files, or structure changes
+    - Missing information from the Obsidian project note
+    - Current code structure
+  - Update `CLAUDE.md` with all necessary changes
+  - After updating, re-read `CLAUDE.md` to verify your changes were written correctly
+- If `CLAUDE.md` does NOT exist:
+  - CREATE a new `CLAUDE.md` file with AI project context including:
+    - What the project is (overview and purpose)
+    - Project structure (key directories and files)
+    - How to work on it (build commands, testing, development workflow)
+    - Any important technical details or conventions
+  - This applies to ALL project types, not just code projects
 - Check for other AI Context files (`AGENTS.md`, `GEMINI.md`, etc.) and apply the same updates
-- If this step fails or CLAUDE.md doesn't exist, note this in your final summary but continue to step 5
+- If this step fails for any reason, STOP and report the error clearly before continuing
 
 ### 5. Ensure Git Remote Metadata
 

@@ -205,6 +205,54 @@ The agent was significantly improved to ensure reliable execution of all documen
 - Silent failures when updating repository documentation
 - Missing TodoWrite visibility for users
 
+### Critical Bug Fix: CLAUDE.md Creation Logic (v2.1.1 - 2026-01-02)
+
+A critical bug was discovered and fixed in the agent's Step 4 (AI Context files) logic:
+
+**The Bug:**
+- Agent Step 4 would only UPDATE existing CLAUDE.md files
+- If CLAUDE.md didn't exist, the agent would silently skip creation
+- This meant projects were missing AI context documentation entirely
+- The bug went undetected because the agent would report "CLAUDE.md not found" and continue to Step 5
+
+**Root Cause:**
+- Step 4 had a single-branch if-then logic: "if CLAUDE.md exists, update it"
+- No else branch to handle creation when file was missing
+- The CRITICAL label emphasized updating but not creating
+- Error handling instruction was to "note this in final summary but continue" which allowed silent skipping
+
+**The Fix (commit 8ea4fcf):**
+Updated `agent/obsidian-project-documentation-manager.md` Step 4 with comprehensive two-branch logic:
+
+1. **If CLAUDE.md exists** (18 lines → 23 lines):
+   - Check specifically for `CLAUDE.md` (not CLAUDE_SYSTEM_PROMPT.md or other variants)
+   - Read current content and analyze what needs updating based on session context
+   - Update with architectural changes, new features, structure changes
+   - Re-read file to verify changes were written correctly
+
+2. **If CLAUDE.md does NOT exist** (new branch, +9 lines):
+   - CREATE new CLAUDE.md with comprehensive AI project context:
+     - What the project is (overview and purpose)
+     - Project structure (key directories and files)
+     - How to work on it (build commands, testing, development workflow)
+     - Important technical details or conventions
+   - Applies to ALL project types, not just code projects
+
+3. **Improved error handling**:
+   - Changed from "note in summary but continue" to "STOP and report error clearly"
+   - Prevents silent failures that skip documentation steps
+
+**Testing:**
+- This documentation session itself verifies the fix works
+- Agent should now create CLAUDE.md for projects currently lacking AI context files
+- Future sessions on new projects will have proper context handoff
+
+**Impact:**
+- Fixes significant gap where projects were missing AI context documentation
+- Improves handoff between work sessions when Claude needs project background
+- Makes agent more proactive about maintaining complete documentation set
+- Ensures consistency across all documented projects
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable

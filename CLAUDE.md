@@ -253,6 +253,53 @@ Updated `agent/obsidian-project-documentation-manager.md` Step 4 with comprehens
 - Makes agent more proactive about maintaining complete documentation set
 - Ensures consistency across all documented projects
 
+### Critical Bug Fix: Skill Name Mismatch (v2.1.2 - 2026-01-04)
+
+A critical naming conflict was discovered and fixed that prevented the skill from being triggered correctly:
+
+**The Bug:**
+- Two different skill versions installed simultaneously with conflicting names:
+  - Old v1.1.0: `~/.claude/skills/obsidian-project-assistant/` with skill name "obsidian-project-assistant"
+  - Current v2.1.1: `~/.claude/skills/obsidian-project-documentation-assistant/` with skill name "obsidian-project-assistant" (INCORRECT)
+- SKILL.md frontmatter had incorrect name that didn't match its directory name
+- Claude Code couldn't unambiguously determine which skill to invoke
+- Trigger phrases like "wrap this up" or "document this" failed due to ambiguity
+
+**Root Cause:**
+- Line 2 of `skill/obsidian-project-documentation-assistant/SKILL.md` had `name: "obsidian-project-assistant"`
+- Should have been `name: "obsidian-project-documentation-assistant"` to match directory structure
+- This created a naming conflict when both skill versions were installed
+- Old v1.1.0 installation was never properly removed during upgrade to v2.x
+
+**The Fix:**
+1. Updated `skill/obsidian-project-documentation-assistant/SKILL.md` frontmatter:
+   - Changed name from "obsidian-project-assistant" to "obsidian-project-documentation-assistant"
+   - Ensures skill name matches directory name for consistency
+2. Removed old v1.1.0 skill installation:
+   - Deleted `~/.claude/skills/obsidian-project-assistant/` directory entirely
+   - Eliminated naming conflict at source
+3. Reinstalled skill with corrected configuration:
+   - Ran `./install /Users/alister/Documents/ObsidianVault`
+   - Verified single, unambiguous skill installation
+
+**Technical Details:**
+- Skill names must be unique across `~/.claude/skills/` directory
+- Claude Code matches trigger phrases to skill names from SKILL.md frontmatter
+- Ambiguous names cause invocation failures with no clear error message
+- **Best practice**: Skill name in frontmatter should match directory name for clarity and uniqueness
+
+**Testing:**
+- Verified only one skill installation exists in `~/.claude/skills/`
+- Confirmed frontmatter name matches directory structure
+- Skill now triggers reliably with natural language phrases
+
+**Impact:**
+- Fixes inability to trigger documentation skill with natural language
+- Ensures reliable skill invocation going forward
+- Eliminates confusion from multiple installed versions
+- Establishes clearer naming convention for skill identification
+- Users upgrading from v1.x should remove old installation directory manually
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable

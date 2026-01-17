@@ -25,7 +25,7 @@ This skill:
 
 This skill:
 
-1. Loads configuration from `~/.claude/skills/obsidian-project-assistant/config.json`
+1. Loads configuration from `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
 2. Detects project context (name, area, type) from current directory
 3. Asks the User for clarification if context is ambiguous
 4. Launches a documentation agent with the detected context

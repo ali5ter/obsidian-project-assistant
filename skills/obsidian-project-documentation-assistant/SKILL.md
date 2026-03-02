@@ -1,7 +1,7 @@
 ---
 name: obsidian-project-documentation-assistant
 description: Document technical projects in Obsidian vault. Use when the User mentions "document this", "close out", "wrap up", "update notes", "track progress", "where are we at", "what is the status", or discusses maintaining project documentation, experiment logs, asks for the state of the project, what next steps are, or work progress in Obsidian.
-version: 3.0.0
+version: 3.0.1
 allowed-tools: Read, Bash, AskUserQuestion, Task
 ---
 

@@ -7,7 +7,7 @@
       "name": "obsidian-project-documentation-assistant",
       "source": { "source": "github", "repo": "ali5ter/obsidian-project-assistant" },
       "description": "Automatically documents technical projects in Obsidian vaults",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "license": "MIT",
       "keywords": ["obsidian", "documentation", "notes"]
     }

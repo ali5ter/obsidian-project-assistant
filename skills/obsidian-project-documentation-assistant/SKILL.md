@@ -168,7 +168,7 @@ Options:
 
 ### Step 4: Launch Documentation Agent
 
-Once you have all context, launch an `obsidian-project-documentation-manager` agent.
+Once you have all context, launch an `obsidian-project-documentation-assistant:obsidian-project-documentation-manager` agent.
 
 ### Step 5: Report Results
 

@@ -1,7 +1,7 @@
 ---
 name: obsidian-project-documentation-assistant
 description: Document technical projects in Obsidian vault. Use when the User mentions "document this", "close out", "wrap up", "update notes", "track progress", "where are we at", "what is the status", or discusses maintaining project documentation, experiment logs, asks for the state of the project, what next steps are, or work progress in Obsidian.
-version: 2.1.0
+version: 3.0.0
 allowed-tools: Read, Bash, AskUserQuestion, Task
 ---
 
@@ -25,7 +25,7 @@ This skill:
 
 This skill:
 
-1. Loads configuration from `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
+1. Loads configuration from `~/.claude/obsidian-project-assistant-config.json`
 2. Detects project context (name, area, type) from current directory
 3. Asks the User for clarification if context is ambiguous
 4. Launches a documentation agent with the detected context
@@ -43,7 +43,7 @@ This skill:
 ### Step 1: Load Configuration
 
 ```bash
-cat ~/.claude/skills/obsidian-project-assistant/config.json
+cat ~/.claude/obsidian-project-assistant-config.json 2>/dev/null
 ```
 
 Expected format:
@@ -58,11 +58,33 @@ Expected format:
 }
 ```
 
-If config doesn't exist, inform the User they need to reinstall the skill:
+**If config doesn't exist (first-run setup):**
+
+Use AskUserQuestion to ask the User for their Obsidian vault path:
+
+```text
+Question: "Where is your Obsidian vault? (e.g. ~/Documents/ObsidianVault)"
+Options:
+  - ~/Documents/ObsidianVault
+  - ~/Documents/MyVault
+  - Other (custom path)
+```
+
+Then write the config to `~/.claude/obsidian-project-assistant-config.json`:
 
 ```bash
-install install /path/to/vault
+cat > ~/.claude/obsidian-project-assistant-config.json <<EOF
+{
+  "vault_path": "<user-provided path with ~ expanded to $HOME>",
+  "areas": ["Hardware", "Software", "Woodworking", "Music Synthesis"],
+  "auto_commit": false,
+  "auto_push": false,
+  "git_enabled": true
+}
+EOF
 ```
+
+Confirm the config was written, then continue with context detection as normal.
 
 ### Step 2: Quick Context Detection
 
@@ -163,7 +185,7 @@ When the agent completes, inform the User:
 
 If errors occur:
 
-- **Config missing**: Instruct the User to run installation
+- **Config missing**: Run first-run setup (ask for vault path, write config)
 - **Vault not accessible**: Verify vault_path in config
 - **Git operations fail**: Report error, but still create/update note
 - **Template missing**: Use a basic template or ask the User to reinstall

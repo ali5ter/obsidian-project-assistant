@@ -4,30 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code skill that automatically documents technical projects in Obsidian vaults. It's distributed via git repository with a bash installer that copies skill files to `~/.claude/skills/obsidian-project-documentation-assistant/` and an agent file to `~/.claude/agents/`, enabling automatic documentation of projects in a user's Obsidian vault.
+This is a Claude Code plugin (v3.0.0) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
 
 **Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
 ## Commands
 
-### Installation
+### Installation (Claude Code plugin framework)
+```
+/plugin marketplace add ali5ter/obsidian-project-assistant
+/plugin install obsidian-project-documentation-assistant@ali5ter
+```
+
+First trigger of the skill prompts for vault path — no separate setup step needed.
+
+### Migration from v2.x (bash-installer users)
 ```bash
-# Clone the repository
-git clone https://github.com/ali5ter/obsidian-project-assistant.git
-cd obsidian-project-assistant
+git pull
+./migrate
+```
+Then run the two `/plugin` commands above.
 
-# Install to a vault (creates vault if needed)
-./install ~/Documents/MyVault
-
-# Or install from current directory (if you're already in your vault)
-cd ~/Documents/MyVault
-/path/to/obsidian-project-assistant/install
+### Uninstall
+```
+/plugin uninstall obsidian-project-documentation-assistant@ali5ter
 ```
 
 ### Development Workflow
 When testing skill changes:
-1. Edit files in `skill/obsidian-project-documentation-assistant/` or `agent/obsidian-project-documentation-manager.md`
-2. Reinstall to test vault: `./install ~/test-vault`
+1. Edit files in `skills/obsidian-project-documentation-assistant/` or `agents/obsidian-project-documentation-manager.md`
+2. Reinstall plugin locally to test
 3. Start Claude Code in a test project directory
 4. Trigger the skill with phrases like "document this project"
 5. Verify notes are created/updated in the test vault
@@ -36,20 +42,16 @@ When testing skill changes:
 
 ### Two-Part System
 
-1. **Installation** (`install` bash script)
-   - Single bash script that handles all installation logic
-   - Uses `pfb` library (submodule at `lib/pfb/`) for UI/formatting
-   - Copies skill files from `skill/` to `~/.claude/skills/obsidian-project-documentation-assistant/`
-   - Copies agent file from `agent/` to `~/.claude/agents/`
-   - Generates `config.json` with vault path at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
-   - Optionally initializes git repository in vault
+1. **Plugin Manifest** (`.claude-plugin/`)
+   - `plugin.json` — plugin metadata (name, version, author, keywords)
+   - `marketplace.json` — makes the repo itself a self-hosted marketplace entry
 
 2. **Skill + Agent Implementation**
-   - **Skill** (`skill/obsidian-project-documentation-assistant/SKILL.md`) - Lightweight launcher that detects context and spawns agent
-   - **Agent** (`agent/obsidian-project-documentation-manager.md`) - Does the actual documentation work
-   - **Templates** (`skill/obsidian-project-documentation-assistant/project-template.md`) - Note template with `{{placeholder}}` syntax
-   - **Helpers** (`skill/obsidian-project-documentation-assistant/*.md`) - Reference documentation for context detection rules (area-mapping.md, context-detection.md)
-   - **Config** - Generated during installation at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
+   - **Skill** (`skills/obsidian-project-documentation-assistant/SKILL.md`) - Lightweight launcher that detects context and spawns agent
+   - **Agent** (`agents/obsidian-project-documentation-manager.md`) - Does the actual documentation work
+   - **Templates** (`skills/obsidian-project-documentation-assistant/project-template.md`) - Note template with `{{placeholder}}` syntax
+   - **Helpers** (`skills/obsidian-project-documentation-assistant/*.md`) - Reference documentation for context detection rules (area-mapping.md, context-detection.md)
+   - **Config** - Written on first use to `~/.claude/obsidian-project-assistant-config.json`
 
 ### Execution Flow (Agent-Based Architecture)
 
@@ -72,7 +74,7 @@ The skill uses file patterns and bash commands to infer project metadata:
 - **Area Classification**: File extension presence (`.ino` → Hardware, `.js` → Software, `.stl` → Woodworking, `.pd` → Music Synthesis)
 - **Description**: Extract from README.md, package.json, or conversation
 
-See `skill/obsidian-project-documentation-assistant/context-detection.md` for complete detection rules.
+See `skills/obsidian-project-documentation-assistant/context-detection.md` for complete detection rules.
 
 ### Template System
 
@@ -88,17 +90,19 @@ When updating existing notes, the skill appends to the Progress Log section whil
 
 ```
 obsidian-project-assistant/
-├── skill/
-│   └── obsidian-project-documentation-assistant/  # Skill files (copied to ~/.claude/skills/)
+├── .claude-plugin/
+│   ├── plugin.json                                # Plugin metadata (name, version, author)
+│   └── marketplace.json                           # Self-hosted marketplace entry
+├── skills/
+│   └── obsidian-project-documentation-assistant/  # Skill files
 │       ├── SKILL.md                               # CRITICAL: Launcher that detects context
 │       ├── project-template.md                    # Project note template
 │       ├── context-detection.md                   # Detection algorithm details
 │       └── area-mapping.md                        # File extension mappings
-├── agent/
-│   └── obsidian-project-documentation-manager.md  # Agent that does documentation work (copied to ~/.claude/agents/)
-├── lib/
-│   └── pfb/                                       # Pretty Formatting for Bash (submodule)
-├── install                                        # Bash installation script
+├── agents/
+│   └── obsidian-project-documentation-manager.md  # Agent that does documentation work
+├── migrate                                        # Migration script (v2.x → v3.x)
+├── install                                        # DEPRECATED: redirects to /plugin commands
 ├── CLAUDE.md                                      # This file - AI context
 ├── README.md                                      # User documentation
 └── LICENSE                                        # MIT License
@@ -115,16 +119,17 @@ This two-phase architecture (launcher skill + custom agent) provides token effic
 
 ## Key Implementation Details
 
-### Installation Architecture
-- `install` is a bash script that handles all installation
-- Uses `pfb` library (Pretty Formatting for Bash) for UI elements via git submodule
-- Takes vault path as argument (defaults to current directory)
-- Copies skill directory to `~/.claude/skills/obsidian-project-documentation-assistant/`
-- Copies agent file to `~/.claude/agents/obsidian-project-documentation-manager.md`
-- Generates `config.json` at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
-- Checks if vault exists and is initialized by Obsidian (looks for `.obsidian/` directory)
-- Optionally initializes git repository in vault if not present
-- Updates `git_enabled` config based on user choices
+### Plugin Architecture (v3.0.0+)
+- Distributed via Claude Code native plugin framework (`/plugin marketplace add`, `/plugin install`)
+- Plugin manifest at `.claude-plugin/plugin.json` (name, version, author, keywords)
+- Marketplace entry at `.claude-plugin/marketplace.json` (makes repo self-hostable as a marketplace)
+- `install` script is deprecated — shows redirect message pointing to `/plugin` commands
+- `migrate` script handles v2.x → v3.x migration: preserves config, removes old files
+
+### Config Location (v3.0.0+)
+- Config file: `~/.claude/obsidian-project-assistant-config.json`
+- Created automatically on first use by SKILL.md first-run setup (asks user for vault path)
+- Previously was at `~/.claude/skills/obsidian-project-documentation-assistant/config.json`
 
 ### Skill Invocation
 - Activated by keywords in user messages: "document this", "log experiment", "track progress", "update notes"
@@ -138,7 +143,8 @@ This two-phase architecture (launcher skill + custom agent) provides token effic
 The skill uses a two-phase architecture for token efficiency and background execution:
 
 **Phase 1: Launcher (SKILL.md)**
-- Loads configuration from `config.json`
+- Loads configuration from `~/.claude/obsidian-project-assistant-config.json`
+- On first run (config missing): asks user for vault path via AskUserQuestion, writes config
 - Detects project context (name, area, description) using bash commands
 - Asks clarifying questions if context is ambiguous (AskUserQuestion tool)
 - Prepares agent prompt with complete context
@@ -226,7 +232,7 @@ A critical bug was discovered and fixed in the agent's Step 4 (AI Context files)
 - Error handling instruction was to "note this in final summary but continue" which allowed silent skipping
 
 **The Fix (commit 8ea4fcf):**
-Updated `agent/obsidian-project-documentation-manager.md` Step 4 with comprehensive two-branch logic:
+Updated `agents/obsidian-project-documentation-manager.md` Step 4 with comprehensive two-branch logic:
 
 1. **If CLAUDE.md exists** (18 lines → 23 lines):
    - Check specifically for `CLAUDE.md` (not CLAUDE_SYSTEM_PROMPT.md or other variants)
@@ -270,13 +276,13 @@ A critical naming conflict was discovered and fixed that prevented the skill fro
 - Trigger phrases like "wrap this up" or "document this" failed due to ambiguity
 
 **Root Cause:**
-- Line 2 of `skill/obsidian-project-documentation-assistant/SKILL.md` had `name: "obsidian-project-assistant"`
+- Line 2 of `skills/obsidian-project-documentation-assistant/SKILL.md` had `name: "obsidian-project-assistant"`
 - Should have been `name: "obsidian-project-documentation-assistant"` to match directory structure
 - This created a naming conflict when both skill versions were installed
 - Old v1.1.0 installation was never properly removed during upgrade to v2.x
 
 **The Fix:**
-1. Updated `skill/obsidian-project-documentation-assistant/SKILL.md` frontmatter:
+1. Updated `skills/obsidian-project-documentation-assistant/SKILL.md` frontmatter:
    - Changed name from "obsidian-project-assistant" to "obsidian-project-documentation-assistant"
    - Ensures skill name matches directory name for consistency
 2. Removed old v1.1.0 skill installation:
@@ -336,6 +342,24 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
 - `area-mapping.md` now includes "Canonical Technology Names for Relationship Matching" section
 - Per-area lookup tables map aliases and file extensions to consistent canonical names
 
+### Plugin Framework Migration (v3.0.0 - 2026-03-02)
+
+Migrated distribution from bash installer to Claude Code native plugin framework:
+
+**Changes:**
+- `skill/` renamed → `skills/`, `agent/` renamed → `agents/` (plugin framework conventions)
+- `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` created
+- `lib/pfb` submodule removed (only served the deprecated bash installer)
+- `install` script replaced with deprecation notice pointing to `/plugin` commands
+- `migrate` script added to handle v2.x → v3.x user migration
+- Config location changed from `~/.claude/skills/obsidian-project-documentation-assistant/config.json` to `~/.claude/obsidian-project-assistant-config.json`
+- SKILL.md updated with first-run setup: asks user for vault path on first use (no separate install step)
+
+**User migration path:**
+1. `git pull && ./migrate` — preserves config, removes old files
+2. `/plugin marketplace add ali5ter/obsidian-project-assistant`
+3. `/plugin install obsidian-project-documentation-assistant@ali5ter`
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable
@@ -344,15 +368,15 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
 - Remember: this file is instruction text, not executable code
 
 ### When Adding New Area Types
-1. Add file extensions to `skill/obsidian-project-documentation-assistant/area-mapping.md`
-2. Add detection bash commands to `skill/obsidian-project-documentation-assistant/context-detection.md`
-3. Update `skill/obsidian-project-documentation-assistant/SKILL.md` detection section
-4. Add area to default config in `install` script (around line 63-64)
+1. Add file extensions to `skills/obsidian-project-documentation-assistant/area-mapping.md`
+2. Add detection bash commands to `skills/obsidian-project-documentation-assistant/context-detection.md`
+3. Update `skills/obsidian-project-documentation-assistant/SKILL.md` detection section
+4. Add area to default config written by SKILL.md first-run setup
 5. Test manually with a project containing those file types
 
 ### When Modifying Templates
 - Keep `{{placeholder}}` syntax consistent
-- Template is at `skill/obsidian-project-documentation-assistant/project-template.md`
+- Template is at `skills/obsidian-project-documentation-assistant/project-template.md`
 - Maintain frontmatter format (YAML between `---` markers)
 - Agent performs direct string replacement, so placeholders must match exactly
 
@@ -366,31 +390,29 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
 
 ### Adding a New Project Area (e.g., "Photography")
 
-1. Update `skill/obsidian-project-documentation-assistant/area-mapping.md` with file extensions
-2. Update `skill/obsidian-project-documentation-assistant/context-detection.md` with detection command
-3. Update `skill/obsidian-project-documentation-assistant/SKILL.md` detection section
-4. Add "Photography" to default areas in `install` script (around line 63)
+1. Update `skills/obsidian-project-documentation-assistant/area-mapping.md` with file extensions
+2. Update `skills/obsidian-project-documentation-assistant/context-detection.md` with detection command
+3. Update `skills/obsidian-project-documentation-assistant/SKILL.md` detection section
+4. Add "Photography" to the default areas list in SKILL.md first-run setup
 5. Test with a sample photography project containing relevant file types (.raw, .jpg, etc.)
 
 ### Debugging Skill Behavior
 
-1. Check skill is installed: `ls ~/.claude/skills/obsidian-project-documentation-assistant/`
-2. Check agent is installed: `ls ~/.claude/agents/obsidian-project-documentation-manager.md`
-3. Verify config: `cat ~/.claude/skills/obsidian-project-documentation-assistant/config.json`
-4. Test context detection manually: `cd test-project && git rev-parse --show-toplevel`
-5. Review SKILL.md to understand launcher behavior
-6. Review agent file to understand documentation logic
-7. Check vault permissions: `ls -la ~/path/to/vault/Projects/`
+1. Check plugin is installed: `/plugin list` in Claude Code
+2. Verify config: `cat ~/.claude/obsidian-project-assistant-config.json`
+3. Test context detection manually: `cd test-project && git rev-parse --show-toplevel`
+4. Review `skills/obsidian-project-documentation-assistant/SKILL.md` to understand launcher behavior
+5. Review `agents/obsidian-project-documentation-manager.md` to understand documentation logic
+6. Check vault permissions: `ls -la ~/path/to/vault/Projects/`
 
 ### Publishing Updates
 
-1. Update version in `skill/obsidian-project-documentation-assistant/SKILL.md` frontmatter
-2. Update CHANGELOG.md (if it exists) with changes
-3. Test installation with `./install ~/test-vault`
-4. Verify skill and agent work correctly
-5. Commit changes: `git commit -am "Version bump and changes"`
-6. Create git tag: `git tag v1.x.x`
-7. Push to GitHub: `git push origin main --tags`
+1. Update version in `skills/obsidian-project-documentation-assistant/SKILL.md` frontmatter
+2. Update version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+3. Verify skill and agent work correctly
+4. Commit changes: `git commit -am "Version bump and changes"`
+5. Create git tag: `git tag v3.x.x`
+6. Push to GitHub: `git push origin main --tags`
 
 ## Important Notes
 
@@ -398,6 +420,6 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
 - The skill must be robust to being invoked from any directory (always use absolute paths)
 - Error handling should gracefully ask users for clarification rather than failing silently
 - Preserve user content when updating existing notes (only append to designated sections)
-- Config file location: `~/.claude/skills/obsidian-project-documentation-assistant/config.json` (not in vault)
-- Agent file location: `~/.claude/agents/obsidian-project-documentation-manager.md`
+- Config file location: `~/.claude/obsidian-project-assistant-config.json` (not in vault, created on first use)
+- Agent installed by plugin framework into `~/.claude/agents/` automatically
 - Template placeholder format is strict: `{{key}}` with double braces, no spaces

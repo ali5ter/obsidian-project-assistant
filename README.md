@@ -21,20 +21,34 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 
 ## Installation
 
-Clone the repository and run the installer:
+Install via the Claude Code plugin system — no cloning or bash scripts needed.
+
+Run these two commands inside Claude Code:
+
+```
+/plugin marketplace add ali5ter/obsidian-project-assistant
+/plugin install obsidian-project-documentation-assistant@ali5ter
+```
+
+The first time you trigger the skill it will ask for your Obsidian vault path. No separate setup step is needed.
+
+### Upgrading from v2.x
+
+If you previously used the bash installer, run the migration script once to preserve your config and remove the old files:
 
 ```bash
 git clone https://github.com/ali5ter/obsidian-project-assistant.git
 cd obsidian-project-assistant
-./install ~/Documents/MyVault
+./migrate
 ```
 
-This will:
+Then install via the two `/plugin` commands above.
 
-- Check if the Obsidian Vault directory exists
-- Install note templates
-- Set up the Claude Code skill and agent
-- Optionally initialize a git repository
+### Uninstall
+
+```
+/plugin uninstall obsidian-project-documentation-assistant@ali5ter
+```
 
 ## Usage
 
@@ -104,7 +118,7 @@ Any project notes will be placed into a `Projects` directory in your Obsidian Va
 
 ## Configuration
 
-The skill is configured in `~/.claude/skills/obsidian-project-documentation-assistant/config.json`:
+The skill is configured in `~/.claude/obsidian-project-assistant-config.json` (created automatically on first use):
 
 ```json
 {
@@ -134,7 +148,7 @@ The skill is configured in `~/.claude/skills/obsidian-project-documentation-assi
 
 ### Custom Areas
 
-Edit `~/.claude/skills/obsidian-project-documentation-assistant/config.json`:
+Edit `~/.claude/obsidian-project-assistant-config.json`:
 
 ```json
 {
@@ -148,18 +162,18 @@ Edit `~/.claude/skills/obsidian-project-documentation-assistant/config.json`:
 }
 ```
 
-Update the `~/.claude/skills/obsidian-project-documentation-assistant/area-mapping.md` and `~/.claude/skills/obsidian-project-documentation-assistant/context-detection.md` definitions to help detect the custom area.
+Update the `~/.claude/plugins/obsidian-project-documentation-assistant/area-mapping.md` and `~/.claude/plugins/obsidian-project-documentation-assistant/context-detection.md` definitions to help detect the custom area.
 
 ### Custom Template
 
-The project note template used by the agent is located at `~/.claude/skills/obsidian-project-documentation-assistant/project-template.md`. You can edit this file directly to customize the structure and content of your project notes.
+The project note template used by the agent is located at `~/.claude/plugins/obsidian-project-documentation-assistant/project-template.md`. You can edit this file directly to customize the structure and content of your project notes.
 
 ## Troubleshooting
 
 **Skill not activating:**
 
-- Check that `~/.claude/skills/obsidian-project-documentation-assistant/` exists
-- Verify config.json has correct vault_path
+- Check the plugin is installed: `/plugin list` in Claude Code
+- Verify config has correct vault_path: `cat ~/.claude/obsidian-project-assistant-config.json`
 - Restart Claude Code
 
 **Wrong area detected:**

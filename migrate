@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# @file migrate
+# @brief Migrate from bash-installer-based v2.x to plugin framework v3.x
+# @author Alister Lewis-Bowen <alister@lewis-bowen.org>
+
+set -euo pipefail
+
+OLD_SKILL="$HOME/.claude/skills/obsidian-project-documentation-assistant"
+OLD_AGENT="$HOME/.claude/agents/obsidian-project-documentation-manager.md"
+OLD_CONFIG="$OLD_SKILL/config.json"
+NEW_CONFIG="$HOME/.claude/obsidian-project-assistant-config.json"
+
+if [[ ! -d "$OLD_SKILL" ]]; then
+    echo "No old installation found. Nothing to migrate."
+    exit 0
+fi
+
+echo "Found old v2.x installation at $OLD_SKILL"
+echo ""
+
+if [[ -f "$OLD_CONFIG" ]]; then
+    cp "$OLD_CONFIG" "$NEW_CONFIG"
+    echo "Config preserved → $NEW_CONFIG"
+else
+    echo "No config found at $OLD_CONFIG — you will be prompted for your vault path on first use."
+fi
+
+rm -rf "$OLD_SKILL"
+echo "Removed old skill directory: $OLD_SKILL"
+
+if [[ -f "$OLD_AGENT" ]]; then
+    rm -f "$OLD_AGENT"
+    echo "Removed old agent file: $OLD_AGENT"
+fi
+
+echo ""
+echo "Migration complete. Now run these two commands in Claude Code:"
+echo ""
+echo "  /plugin marketplace add ali5ter/obsidian-project-assistant"
+echo "  /plugin install obsidian-project-documentation-assistant@ali5ter"
+echo ""

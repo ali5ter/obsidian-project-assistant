@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (v3.0.0) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
+This is a Claude Code plugin (v3.0.1) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
 
 **Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
@@ -360,6 +360,25 @@ Migrated distribution from bash installer to Claude Code native plugin framework
 2. `/plugin marketplace add ali5ter/obsidian-project-assistant`
 3. `/plugin install obsidian-project-documentation-assistant@ali5ter`
 
+### Post-Migration Bug Fixes (v3.0.1 - 2026-03-02)
+
+Two bugs discovered and fixed during live testing of the v3.0.0 plugin framework installation:
+
+**Bug 1: Agent subagent_type namespace (commit cac5ba7)**
+
+When installed via the Claude Code plugin framework, `subagent_type` in SKILL.md must include the plugin namespace prefix:
+
+- Wrong: `subagent_type: obsidian-project-documentation-manager`
+- Correct: `subagent_type: obsidian-project-documentation-assistant:obsidian-project-documentation-manager`
+
+The namespace prefix is required in plugin-installed deployments. Bare agent names only work in development (manually placed agents). This is a framework-level requirement and must be respected in any future agent additions.
+
+**Bug 2: Tag/version ordering in release workflow**
+
+The plugin framework caches the plugin using the git tag. If you tag before committing the updated version numbers in `plugin.json` and `marketplace.json`, the cache is populated with the wrong version. Always follow the order in the "Publishing Updates" section: bump → commit → tag → push.
+
+The v3.0.1 tag was moved to the correct commit and the GitHub release was recreated.
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable
@@ -407,11 +426,13 @@ Migrated distribution from bash installer to Claude Code native plugin framework
 
 ### Publishing Updates
 
+CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plugin framework caches by tag, so the tag must point at the commit that already contains the updated version numbers.
+
 1. Update version in `skills/obsidian-project-documentation-assistant/SKILL.md` frontmatter
 2. Update version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
 3. Verify skill and agent work correctly
-4. Commit changes: `git commit -am "Version bump and changes"`
-5. Create git tag: `git tag v3.x.x`
+4. Commit changes: `git commit -am "Version bump and changes"` (version numbers must be in this commit)
+5. Create git tag pointing at the version-bump commit: `git tag v3.x.x`
 6. Push to GitHub: `git push origin main --tags`
 
 ## Important Notes

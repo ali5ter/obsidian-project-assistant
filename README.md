@@ -162,11 +162,11 @@ Edit `~/.claude/obsidian-project-assistant-config.json`:
 }
 ```
 
-Update the `~/.claude/plugins/obsidian-project-documentation-assistant/area-mapping.md` and `~/.claude/plugins/obsidian-project-documentation-assistant/context-detection.md` definitions to help detect the custom area.
+Update the `area-mapping.md` and `context-detection.md` files in the plugin cache at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation-assistant/<version>/skills/obsidian-project-documentation-assistant/` to help detect the custom area.
 
 ### Custom Template
 
-The project note template used by the agent is located at `~/.claude/plugins/obsidian-project-documentation-assistant/project-template.md`. You can edit this file directly to customize the structure and content of your project notes.
+The project note template used by the agent is located at `project-template.md` inside the plugin cache directory `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation-assistant/<version>/skills/obsidian-project-documentation-assistant/`. You can edit this file directly to customize the structure and content of your project notes.
 
 ## Troubleshooting
 

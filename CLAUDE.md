@@ -172,7 +172,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Expected output format
 
 ### Template Processing
-- Template is stored at `~/.claude/skills/obsidian-project-documentation-assistant/project-template.md`
+- Template is stored at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation-assistant/<version>/skills/obsidian-project-documentation-assistant/project-template.md` (plugin framework cache location)
 - Agent reads template and performs string replacement for placeholders (simple substitution)
 - Date generated via `date +%Y-%m-%d` bash command
 - Placeholders: `{{title}}`, `{{area}}`, `{{area_tag}}`, `{{date}}`, `{{description}}`

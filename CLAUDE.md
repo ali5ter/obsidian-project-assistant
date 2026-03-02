@@ -169,7 +169,11 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Template is stored at `~/.claude/skills/obsidian-project-documentation-assistant/project-template.md`
 - Agent reads template and performs string replacement for placeholders (simple substitution)
 - Date generated via `date +%Y-%m-%d` bash command
-- Placeholders: `{{title}}`, `{{area}}`, `{{date}}`, `{{description}}`
+- Placeholders: `{{title}}`, `{{area}}`, `{{area_tag}}`, `{{date}}`, `{{description}}`
+  - `{{area_tag}}`: area value converted to lowercase with hyphens (e.g., "Music Synthesis" → "music-synthesis")
+- Template frontmatter includes `technologies: []` and `related: []` arrays populated by the agent each session
+- Template includes a "Related Projects" section maintained automatically between Overview and Goals
+- When updating existing notes, the agent appends a new Update section while preserving all user content
 
 ### Git Integration
 - Optional: controlled by `config.json` fields `git_enabled`, `auto_commit`, and `auto_push`
@@ -299,6 +303,38 @@ A critical naming conflict was discovered and fixed that prevented the skill fro
 - Eliminates confusion from multiple installed versions
 - Establishes clearer naming convention for skill identification
 - Users upgrading from v1.x should remove old installation directory manually
+
+### Cross-Project Relationship Analysis (v2.2.0 - 2026-03-02)
+
+Agent Step 2 was added to build knowledge connections across the vault automatically. The agent now:
+
+1. **Extracts canonical technologies** from the session conversation and dependency files (package.json, requirements.txt, etc.), matched against the lookup tables in `area-mapping.md`
+2. **Scans existing vault notes** - reads first 30 lines of each note in `$VAULT_PATH/Projects/` (token-efficient)
+3. **Scores relationship candidates** using a points system:
+   - Same `area:` value → 1 point
+   - Each overlapping technology → 3 points each
+   - Complementary cross-area pairing → 3 points
+   - Project name mentioned in current session → 5 points
+   - Threshold: ≥ 3 points required (same-area alone is not enough)
+4. **Writes relationship data** back to the current note:
+   - `technologies:` frontmatter array with canonical names
+   - `related:` frontmatter array as `["[[Project A]]", "[[Project B]]"]`
+   - "Related Projects" section in note body with one line per link and reason phrase
+   - Both arrays fully rewritten each session (stale links removed automatically)
+
+**Design constraints:**
+- Never link to a note that does not exist in the vault
+- Do not fabricate connection reasons
+- 30-line scan limit keeps token cost bounded as vault grows
+
+**Template changes (v2.2.0):**
+- New frontmatter fields: `tags: [project, project/{{area_tag}}]`, `technologies: []`, `related: []`
+- New "Related Projects" section in note body (agent-maintained, between Overview and Goals)
+- "Reference Links" section now explicitly for external URLs only
+
+**Area mapping changes (v2.2.0):**
+- `area-mapping.md` now includes "Canonical Technology Names for Relationship Matching" section
+- Per-area lookup tables map aliases and file extensions to consistent canonical names
 
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution

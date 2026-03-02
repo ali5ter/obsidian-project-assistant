@@ -12,7 +12,7 @@ Perfect for makers, engineers, and tinkerers who work across multiple technical 
 
 - 🤖 **Auto-documents projects** - Captures progress as you work with Claude Code
 - 📁 **Organized by area** - Classifies projects including Hardware, Software, Woodworking, or Music Synthesis
-- 🔗 **Smart linking** - Automatically links related notes and projects
+- 🔗 **Relationship analysis** - Scores and links related projects using shared technologies and context signals
 - 📝 **Template-based** - Uses consistent, customizable templates
 - 🎯 **Context-aware** - Infers project details from your working directory
 - 🔄 **Git integration** - Optionally commits and pushes changes to your vault repository
@@ -83,6 +83,8 @@ or
 ## How It Works
 
 The skill uses an efficient, non-blocking architecture that works in the background. It does this by using the Obsidian Project Documentation Assistant skill to detect your project context, asks any questions upfront, then triggers the Obsidian Project Documentation Manager agent which handles the documentation work asynchronously. This means you can keep working while your notes are being updated and synced.
+
+The agent also performs cross-project relationship analysis each session, scanning your vault to find genuinely related projects based on shared technologies and explicit context signals, and writes scored wiki-links into each note's frontmatter and body automatically.
 
 ### Context Detection
 

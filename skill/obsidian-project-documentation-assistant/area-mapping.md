@@ -160,6 +160,101 @@ Users can add custom areas in config.json:
 
 If user has custom areas, ask them to classify or provide detection rules.
 
+## Canonical Technology Names for Relationship Matching
+
+When populating the `technologies:` frontmatter field or matching cross-project relationships, use these canonical names for consistency. Matching is case-insensitive; always write the canonical form listed here.
+
+### Hardware
+
+| Canonical Name | Aliases / Indicators |
+| -------------- | -------------------- |
+| Arduino | arduino, `.ino` |
+| ESP32 | esp32, esp-32 |
+| ESP8266 | esp8266, esp-8266 |
+| Teensy | teensy |
+| STM32 | stm32, bluepill |
+| Raspberry Pi | raspberry pi, rpi, raspi |
+| Raspberry Pi Pico | pico, rp2040 |
+| KiCad | kicad, `.kicad_pcb` |
+| I2C | i2c, i²c, wire |
+| SPI | spi |
+| UART | uart, serial |
+| MQTT | mqtt |
+| BLE | ble, bluetooth le, bluetooth low energy |
+| WiFi | wifi, wi-fi, wireless |
+| CNC | cnc, gcode, `.gcode` |
+
+### Software
+
+| Canonical Name | Aliases / Indicators |
+| -------------- | -------------------- |
+| JavaScript | javascript, `.js` |
+| TypeScript | typescript, `.ts` |
+| Python | python, `.py` |
+| Go | golang, `.go` |
+| Rust | rust, `.rs`, cargo |
+| Java | java, `.java` |
+| Ruby | ruby, `.rb` |
+| PHP | php, `.php` |
+| Shell | bash, sh, zsh, `.sh` |
+| React | react, reactjs |
+| Vue | vue, vuejs |
+| Angular | angular |
+| Flask | flask |
+| Django | django |
+| Express | express, expressjs |
+| FastAPI | fastapi |
+| Docker | docker, dockerfile, container |
+| Kubernetes | kubernetes, k8s, helm |
+| PostgreSQL | postgresql, postgres |
+| MySQL | mysql |
+| MongoDB | mongodb, mongo |
+| SQLite | sqlite |
+| Redis | redis |
+| AWS | aws, amazon web services |
+| Claude API | claude api, anthropic, claude code |
+
+### Woodworking
+
+| Canonical Name | Aliases / Indicators |
+| -------------- | -------------------- |
+| Dovetail joinery | dovetail |
+| Mortise and tenon | mortise, tenon |
+| CNC routing | cnc router |
+| Hand-cut joinery | hand-cut, hand cut |
+| Lathe turning | lathe, turned, turning |
+| Oak | oak |
+| Maple | maple |
+| Walnut | walnut |
+| Cherry | cherry |
+| Pine | pine |
+| Plywood | plywood |
+| MDF | mdf |
+| Oil finish | oil, danish oil, tung oil |
+| Polyurethane | polyurethane |
+| Fusion 360 | fusion 360, `.f3d` |
+| SketchUp | sketchup, `.skp` |
+
+### Music Synthesis
+
+| Canonical Name | Aliases / Indicators |
+| -------------- | -------------------- |
+| Eurorack | eurorack, euro-rack |
+| Pure Data | pure data, pd, `.pd` |
+| Max/MSP | max/msp, maxmsp, `.maxpat` |
+| Ableton Live | ableton, live, `.als`, `.amxd` |
+| MIDI | midi, `.syx`, `.mid` |
+| CV/Gate | cv, gate, cv/gate |
+| Analog synthesis | analog, analogue |
+| FM synthesis | fm, fm synthesis, frequency modulation |
+| Granular synthesis | granular |
+| Wavetable synthesis | wavetable |
+| VCO | vco, oscillator |
+| VCF | vcf, filter |
+| VCA | vca, amplifier |
+| ADSR | adsr, envelope |
+| OSC | osc, open sound control |
+
 ## Future Enhancements
 
 Potential improvements for area detection:

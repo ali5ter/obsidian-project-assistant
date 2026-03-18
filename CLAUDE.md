@@ -376,6 +376,30 @@ The plugin framework caches the plugin using the git tag. If you tag before comm
 
 The v3.0.1 tag was moved to the correct commit and the GitHub release was recreated.
 
+### Central Marketplace Migration (v3.0.1 - 2026-03-18)
+
+The plugin's marketplace registration was migrated from a self-hosted `marketplace.json` inside this repository's `.claude-plugin/` directory to the central `ali5ter/claude-plugins` marketplace hosted at a dedicated GitHub repo.
+
+**What changed:**
+
+- Installation command updated to reference the central marketplace:
+
+  ```
+  /plugin marketplace add ali5ter/claude-plugins
+  /plugin install obsidian-project-documentation-assistant@ali5ter
+  ```
+
+- `README.md`, `CLAUDE.md`, `install`, and `migrate` updated (commits `3479ba6`, `160c943`)
+- No functional changes to the skill or agent
+
+**Note on `.claude-plugin/marketplace.json`:**
+
+The commit message for `160c943` states this file should be removed (superseded by the central marketplace), but the deletion was not staged. The file remains present. It can be safely deleted in a future cleanup commit — it no longer drives plugin discovery.
+
+**Why centralise:**
+
+Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-documentation-assistant`) is easier from a single `ali5ter/claude-plugins` repo. This mirrors the thin-catalog architecture used by `anthropics/claude-plugins-official`.
+
 ### When Modifying SKILL.md
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable

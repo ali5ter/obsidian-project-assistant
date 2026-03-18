@@ -455,6 +455,8 @@ CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plu
 4. Commit changes: `git commit -am "Version bump and changes"` (version numbers must be in this commit)
 5. Create git tag pointing at the version-bump commit: `git tag v3.x.x`
 6. Push to GitHub: `git push origin main --tags`
+7. Run `/plugin marketplace update ali5ter` in Claude Code before installing — the installer
+   uses a cached catalog and will not see the new version without an explicit update.
 
 ## Important Notes
 

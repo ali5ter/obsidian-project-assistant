@@ -27,7 +27,7 @@ Run these two commands inside Claude Code:
 
 ```
 /plugin marketplace add ali5ter/claude-plugins
-/plugin install obsidian-project-documentation-assistant@ali5ter
+/plugin install obsidian-project-documentation@ali5ter
 ```
 
 The first time you trigger the skill it will ask for your Obsidian vault path. No separate setup step is needed.
@@ -47,7 +47,7 @@ Then install via the two `/plugin` commands above.
 ### Uninstall
 
 ```
-/plugin uninstall obsidian-project-documentation-assistant@ali5ter
+/plugin uninstall obsidian-project-documentation@ali5ter
 ```
 
 ## Usage
@@ -162,11 +162,11 @@ Edit `~/.claude/obsidian-project-assistant-config.json`:
 }
 ```
 
-Update the `area-mapping.md` and `context-detection.md` files in the plugin cache at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation-assistant/<version>/skills/obsidian-project-documentation-assistant/` to help detect the custom area.
+Update the `area-mapping.md` and `context-detection.md` files in the plugin cache at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/` to help detect the custom area.
 
 ### Custom Template
 
-The project note template used by the agent is located at `project-template.md` inside the plugin cache directory `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation-assistant/<version>/skills/obsidian-project-documentation-assistant/`. You can edit this file directly to customize the structure and content of your project notes.
+The project note template used by the agent is located at `project-template.md` inside the plugin cache directory `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/`. You can edit this file directly to customize the structure and content of your project notes.
 
 ## Troubleshooting
 

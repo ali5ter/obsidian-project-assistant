@@ -1,7 +1,7 @@
 ---
-name: obsidian-project-documentation-assistant
+name: obsidian-project-documentation
 description: Document technical projects in Obsidian vault. Use when the User mentions "document this", "close out", "wrap up", "update notes", "track progress", "where are we at", "what is the status", or discusses maintaining project documentation, experiment logs, asks for the state of the project, what next steps are, or work progress in Obsidian.
-version: 3.0.1
+version: 3.1.0
 allowed-tools: Read, Bash, AskUserQuestion, Task
 ---
 
@@ -168,7 +168,7 @@ Options:
 
 ### Step 4: Launch Documentation Agent
 
-Once you have all context, launch an `obsidian-project-documentation-assistant:obsidian-project-documentation-manager` agent.
+Once you have all context, launch an `obsidian-project-documentation:manager` agent.
 
 ### Step 5: Report Results
 

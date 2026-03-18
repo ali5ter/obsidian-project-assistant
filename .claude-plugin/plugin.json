@@ -1,6 +1,6 @@
 {
-  "name": "obsidian-project-documentation-assistant",
-  "version": "3.0.1",
+  "name": "obsidian-project-documentation",
+  "version": "3.1.0",
   "description": "Automatically documents technical projects in Obsidian vaults during Claude Code sessions",
   "author": { "name": "Alister Lewis-Bowen", "url": "https://github.com/ali5ter" },
   "homepage": "https://github.com/ali5ter/obsidian-project-assistant",

@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-OLD_SKILL="$HOME/.claude/skills/obsidian-project-documentation-assistant"
+OLD_SKILL="$HOME/.claude/skills/obsidian-project-documentation"
 OLD_AGENT="$HOME/.claude/agents/obsidian-project-documentation-manager.md"
 OLD_CONFIG="$OLD_SKILL/config.json"
 NEW_CONFIG="$HOME/.claude/obsidian-project-assistant-config.json"
@@ -37,5 +37,5 @@ echo ""
 echo "Migration complete. Now run these two commands in Claude Code:"
 echo ""
 echo "  /plugin marketplace add ali5ter/claude-plugins"
-echo "  /plugin install obsidian-project-documentation-assistant@ali5ter"
+echo "  /plugin install obsidian-project-documentation@ali5ter"
 echo ""

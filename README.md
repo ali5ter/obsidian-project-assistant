@@ -26,7 +26,7 @@ Install via the Claude Code plugin system — no cloning or bash scripts needed.
 Run these two commands inside Claude Code:
 
 ```
-/plugin marketplace add ali5ter/obsidian-project-assistant
+/plugin marketplace add ali5ter/claude-plugins
 /plugin install obsidian-project-documentation-assistant@ali5ter
 ```
 

@@ -12,7 +12,7 @@ This is a Claude Code plugin (v3.0.1) that automatically documents technical pro
 
 ### Installation (Claude Code plugin framework)
 ```
-/plugin marketplace add ali5ter/obsidian-project-assistant
+/plugin marketplace add ali5ter/claude-plugins
 /plugin install obsidian-project-documentation-assistant@ali5ter
 ```
 
@@ -357,7 +357,7 @@ Migrated distribution from bash installer to Claude Code native plugin framework
 
 **User migration path:**
 1. `git pull && ./migrate` — preserves config, removes old files
-2. `/plugin marketplace add ali5ter/obsidian-project-assistant`
+2. `/plugin marketplace add ali5ter/claude-plugins`
 3. `/plugin install obsidian-project-documentation-assistant@ali5ter`
 
 ### Post-Migration Bug Fixes (v3.0.1 - 2026-03-02)

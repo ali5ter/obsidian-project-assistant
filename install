@@ -8,7 +8,7 @@ The bash installer has been replaced by the Claude Code plugin system.
 
 New install (run inside Claude Code):
 
-  /plugin marketplace add ali5ter/obsidian-project-assistant
+  /plugin marketplace add ali5ter/claude-plugins
   /plugin install obsidian-project-documentation-assistant@ali5ter
 
 The first time you trigger the skill it will ask for your vault path —

@@ -36,6 +36,6 @@ fi
 echo ""
 echo "Migration complete. Now run these two commands in Claude Code:"
 echo ""
-echo "  /plugin marketplace add ali5ter/obsidian-project-assistant"
+echo "  /plugin marketplace add ali5ter/claude-plugins"
 echo "  /plugin install obsidian-project-documentation-assistant@ali5ter"
 echo ""

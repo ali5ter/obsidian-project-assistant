@@ -44,7 +44,6 @@ When testing skill changes:
 
 1. **Plugin Manifest** (`.claude-plugin/`)
    - `plugin.json` — plugin metadata (name, version, author, keywords)
-   - `marketplace.json` — makes the repo itself a self-hosted marketplace entry
 
 2. **Skill + Agent Implementation**
    - **Skill** (`skills/obsidian-project-documentation-assistant/SKILL.md`) - Lightweight launcher that detects context and spawns agent
@@ -91,8 +90,7 @@ When updating existing notes, the skill appends to the Progress Log section whil
 ```
 obsidian-project-assistant/
 ├── .claude-plugin/
-│   ├── plugin.json                                # Plugin metadata (name, version, author)
-│   └── marketplace.json                           # Self-hosted marketplace entry
+│   └── plugin.json                                # Plugin metadata (name, version, author)
 ├── skills/
 │   └── obsidian-project-documentation-assistant/  # Skill files
 │       ├── SKILL.md                               # CRITICAL: Launcher that detects context
@@ -122,7 +120,6 @@ This two-phase architecture (launcher skill + custom agent) provides token effic
 ### Plugin Architecture (v3.0.0+)
 - Distributed via Claude Code native plugin framework (`/plugin marketplace add`, `/plugin install`)
 - Plugin manifest at `.claude-plugin/plugin.json` (name, version, author, keywords)
-- Marketplace entry at `.claude-plugin/marketplace.json` (makes repo self-hostable as a marketplace)
 - `install` script is deprecated — shows redirect message pointing to `/plugin` commands
 - `migrate` script handles v2.x → v3.x migration: preserves config, removes old files
 
@@ -348,7 +345,7 @@ Migrated distribution from bash installer to Claude Code native plugin framework
 
 **Changes:**
 - `skill/` renamed → `skills/`, `agent/` renamed → `agents/` (plugin framework conventions)
-- `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` created
+- `.claude-plugin/plugin.json` created
 - `lib/pfb` submodule removed (only served the deprecated bash installer)
 - `install` script replaced with deprecation notice pointing to `/plugin` commands
 - `migrate` script added to handle v2.x → v3.x user migration
@@ -375,7 +372,7 @@ The namespace prefix is required in plugin-installed deployments. Bare agent nam
 
 **Bug 2: Tag/version ordering in release workflow**
 
-The plugin framework caches the plugin using the git tag. If you tag before committing the updated version numbers in `plugin.json` and `marketplace.json`, the cache is populated with the wrong version. Always follow the order in the "Publishing Updates" section: bump → commit → tag → push.
+The plugin framework caches the plugin using the git tag. If you tag before committing the updated version number in `plugin.json`, the cache is populated with the wrong version. Always follow the order in the "Publishing Updates" section: bump → commit → tag → push.
 
 The v3.0.1 tag was moved to the correct commit and the GitHub release was recreated.
 
@@ -429,7 +426,7 @@ The v3.0.1 tag was moved to the correct commit and the GitHub release was recrea
 CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plugin framework caches by tag, so the tag must point at the commit that already contains the updated version numbers.
 
 1. Update version in `skills/obsidian-project-documentation-assistant/SKILL.md` frontmatter
-2. Update version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`
+2. Update version in `.claude-plugin/plugin.json`
 3. Verify skill and agent work correctly
 4. Commit changes: `git commit -am "Version bump and changes"` (version numbers must be in this commit)
 5. Create git tag pointing at the version-bump commit: `git tag v3.x.x`

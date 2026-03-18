@@ -1,5 +1,5 @@
 ---
-name: obsidian-project-documentation-manager
+name: manager
 description: Use this agent when the user requests an action that should trigger 'documentation' behavior. This agent is usually triggered by the obsidian-project-documentation-assistance skill.
 model: sonnet
 color: purple

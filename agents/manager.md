@@ -1,6 +1,6 @@
 ---
 name: manager
-description: Use this agent when the user requests an action that should trigger 'documentation' behavior. This agent is usually triggered by the obsidian-project-documentation-assistance skill.
+description: Use this agent when the user requests an action that should trigger 'documentation' behavior. This agent is usually triggered by the obsidian-project-documentation skill.
 model: sonnet
 color: purple
 ---
@@ -161,7 +161,7 @@ CRITICAL STEP - Do not skip this:
 
 If the current project is Git controlled (if `git_enabled` in the config):
 
-- Locate the project's `GET_REMOTE` file in the repository root and create it if it is missing.
+- Locate the project's `GIT_REMOTE` file in the repository root and create it if it is missing.
 - Determine the current Git Remote URL. If `git remote get-url origin` succeeds, use that; otherwise fall back to any `REMOTE_URL` already in the file.
 - If no Remote URL determined, prompt the User for the desired remote, configure `origin`, and record it.
 - Update `GIT_REMOTE` so it contains the lines:

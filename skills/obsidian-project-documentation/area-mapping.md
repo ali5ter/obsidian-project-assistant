@@ -90,7 +90,7 @@ clamp, chisel, plane, sandpaper
 ### Music Synthesis Keywords
 
 ```text
-oscillator, vco, vca, vcf, vca
+oscillator, vco, vca, vcf
 filter, lowpass, highpass, bandpass
 envelope, adsr, attack, decay, sustain, release
 lfo, modulation, frequency, amplitude

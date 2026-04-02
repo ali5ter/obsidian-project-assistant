@@ -168,7 +168,35 @@ Options:
 
 ### Step 4: Launch Documentation Agent
 
-Once you have all context, launch an `obsidian-project-documentation:manager` agent.
+Launch an `obsidian-project-documentation:manager` agent with a prompt that includes all of the following context variables. Every variable must be populated from the sources listed — do not leave any as empty or undefined.
+
+| Variable | Source |
+| -------- | ------ |
+| `{vault_path}` | `vault_path` from config |
+| `{project_name}` | Detected or user-supplied in Step 2–3 |
+| `{area}` | Detected or user-supplied in Step 2–3 |
+| `{description}` | Extracted or user-supplied in Step 2–3 |
+| `{cwd}` | Run `pwd` |
+| `{current_date}` | Run `date +%Y-%m-%d` |
+| `{auto_commit}` | `auto_commit` from config |
+| `{auto_push}` | `auto_push` from config |
+| `{git_enabled}` | `git_enabled` from config |
+| `{user_original_message}` | The exact message the User sent that triggered this skill |
+
+Use this prompt template, substituting each `{variable}` with its value:
+
+```text
+Vault Path: {vault_path}
+Project Name: {project_name}
+Project Area: {area}
+Description: {description}
+Working Directory: {cwd}
+Current Date: {current_date}
+auto_commit: {auto_commit}
+auto_push: {auto_push}
+git_enabled: {git_enabled}
+User's original message: {user_original_message}
+```
 
 ### Step 5: Report Results
 

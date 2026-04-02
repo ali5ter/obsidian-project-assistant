@@ -46,12 +46,22 @@ When activated, you will:
 
 - Check if note exists at: {vault_path}/Projects/{project_name}.md
 - If the Projects folder in the User's Obsidian vault doesn't exist, create it.
-- If new: Load template from ~/.claude/skills/obsidian-project-documentation-assistant/project-template.md
-- Fill placeholders: `{{title}}`, `{{date}}`, `{{area}}`, `{{description}}`
-- For `{{area_tag}}`: convert the area value to lowercase with hyphens replacing spaces (e.g., "Music Synthesis" → "music-synthesis", "Hardware" → "hardware")
+- If new: Locate the template using:
+  ```bash
+  find ~/.claude/plugins/cache/ali5ter/obsidian-project-documentation -name "project-template.md" 2>/dev/null | head -1
+  ```
+  Read the file at the returned path.
+- Generate values for all placeholders before substitution:
+  - `{{title}}` — project name
+  - `{{date}}` — run `date +%Y-%m-%d`
+  - `{{time}}` — run `date +%H:%M`
+  - `{{area}}` — detected or user-supplied area
+  - `{{area_tag}}` — area converted to lowercase with hyphens (e.g., "Music Synthesis" → "music-synthesis", "Hardware" → "hardware")
+  - `{{phase}}` — evaluated from the phase progression `Planning → Implementing → Testing → Complete` based on project state; phases can bounce between Implementing and Testing or move back when appropriate
+  - `{{description}}` — project description
+- Fill all placeholders in the template with the generated values.
 - If updating: Read existing note, preserve content, append another Update section with content detailed in step 3 (progress extraction) below.
-- Update the 'updated:' field in frontmatter to {current_date}
-- Evaluate what Phase the project is in using the set of phases `Planning → Implementing → Testing → Complete`. Phases can bounce between Implementation and Testing or move back when appropriate.
+- Update the 'updated:' field in frontmatter to {current_date}.
 
 ### 2. Analyze cross-project relationships and update relationship metadata
 
@@ -60,7 +70,10 @@ This step builds knowledge connections across the vault to power Obsidian's grap
 **Extract technologies from the current project:**
 
 - Scan the working session conversation, README.md, package.json, requirements.txt, Cargo.toml, go.mod, or any other dependency/config files present in {cwd}
-- Identify canonical technology names by matching against `~/.claude/skills/obsidian-project-documentation-assistant/area-mapping.md` (the "Canonical Technology Names for Relationship Matching" section)
+- Identify canonical technology names by matching against the "Canonical Technology Names for Relationship Matching" section in `area-mapping.md`. Locate it using:
+  ```bash
+  find ~/.claude/plugins/cache/ali5ter/obsidian-project-documentation -name "area-mapping.md" 2>/dev/null | head -1
+  ```
 - Write these to the `technologies:` frontmatter array (e.g., `technologies: [Arduino, ESP32, MQTT, I2C]`)
 - Use canonical names exactly as listed in area-mapping.md for consistency across notes
 

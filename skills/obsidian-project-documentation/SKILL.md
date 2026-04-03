@@ -111,25 +111,22 @@ If none of these work or result is generic (like "src", "build", "test"), refer 
 
 #### Detect Project Area
 
-Run quick file pattern checks:
+Run all four area detections in parallel and count matches. This avoids the false positives of a sequential if/elif chain where the first match wins regardless of signal strength.
 
 ```bash
-# Check for Hardware indicators
-if find . -maxdepth 2 -type f \( -name "*.ino" -o -name "*.cpp" -o -name "platformio.ini" \) 2>/dev/null | grep -q .; then
-  echo "Hardware"
-# Check for Software indicators
-elif find . -maxdepth 2 -type f \( -name "package.json" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) 2>/dev/null | grep -q .; then
-  echo "Software"
-# Check for Woodworking indicators
-elif find . -maxdepth 2 -type f \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" \) 2>/dev/null | grep -q .; then
-  echo "Woodworking"
-# Check for Music Synthesis indicators
-elif find . -maxdepth 2 -type f \( -name "*.pd" -o -name "*.maxpat" \) 2>/dev/null | grep -q .; then
-  echo "Music Synthesis"
-fi
+HW=$(find . -maxdepth 2 -type f \( -name "*.ino" -o -name "*.pcb" -o -name "*.sch" -o -name "platformio.ini" -o -name "arduino_secrets.h" \) 2>/dev/null | wc -l)
+SW=$(find . -maxdepth 2 -type f \( -name "package.json" -o -name "requirements.txt" -o -name "Cargo.toml" -o -name "go.mod" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) 2>/dev/null | wc -l)
+WW=$(find . -maxdepth 2 -type f \( -name "*.stl" -o -name "*.blend" -o -name "*.f3d" -o -name "*.skp" -o -name "cut-list.md" \) 2>/dev/null | wc -l)
+MS=$(find . -maxdepth 2 -type f \( -name "*.pd" -o -name "*.maxpat" -o -name "*.syx" -o -name "*.amxd" -o -name "patch-notes.md" \) 2>/dev/null | wc -l)
 ```
 
-If no clear match, refer to step 3 below.
+Select the area using this decision logic:
+
+- If `HW > 0` AND `SW > 0`: area is ambiguous (embedded software) — refer to Step 3
+- Else if exactly one count is greater than all others: use that area
+- Else if all counts are zero, or no clear winner: refer to Step 3
+
+If no clear match, refer to Step 3 below.
 
 #### Extract Description
 

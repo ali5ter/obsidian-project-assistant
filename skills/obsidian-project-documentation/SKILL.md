@@ -13,32 +13,21 @@ This skill helps maintain project documentation in an Obsidian vault while worki
 
 ## How This Works
 
-### Situation 1: When a new working session is started
+Three situations trigger this skill, falling into two execution paths:
 
-This skill:
+| Situation | Trigger | Path |
+| --------- | ------- | ---- |
+| **1** — New session start | User opens a project and says hello, or Claude Code starts | **Path A** — read-only context load |
+| **2** — Mid-session documentation | "document this", "update notes", "track progress", etc. | **Path B** — full documentation run |
+| **3** — Session end | "wrap up", "close out", "we're done for today", etc. | **Path B** — full documentation run |
 
-1. Reads the AI Context file. (this should be a normal task already performed when a working session is started)
-2. Reads the notes for this project if they exist to augement the context of what is happening with the project, the status, decisions made, and the next steps.
-3. Welcomes the User back, asks how they're doing, and briefly inform them of what the next steps are for this new working session.
+**Path A is read-only.** It must never launch the documentation agent or write to the vault.
 
-### Situation 2: When activated during a working session
+**Path B launches the agent.** It performs context detection and spawns the manager agent to write vault notes.
 
-This skill:
+## Shared Step: Load Configuration
 
-1. Loads configuration from `~/.claude/obsidian-project-assistant-config.json`
-2. Detects project context (name, area, type) from current directory
-3. Asks the User for clarification if context is ambiguous
-4. Launches a documentation agent with the detected context
-5. The agent creates/updates notes, handles git operations, and returns results
-
-### Situation 3: When a working session is about to end
-
-This skill:
-
-1. Offers to tie up the project documentation if the User has not already asked to do so.
-2. Perform the steps in Situation 2 above.
-
-## Tasks for Situation 1 and 2
+Before following either path, load the config:
 
 ### Step 1: Load Configuration
 
@@ -84,9 +73,37 @@ cat > ~/.claude/obsidian-project-assistant-config.json <<EOF
 EOF
 ```
 
-Confirm the config was written, then continue with context detection as normal.
+Confirm the config was written, then follow the appropriate path below.
 
-### Step 2: Quick Context Detection
+## Path A: Session Start (Situation 1)
+
+Read-only. Do not launch the agent. Do not write to the vault.
+
+### Step A1: Detect Project Name
+
+Use the same detection logic as Step B2 (git repo name → directory name) to determine which vault note to load.
+
+### Step A2: Read Project Context
+
+```bash
+cat "{vault_path}/Projects/{project_name}.md" 2>/dev/null
+```
+
+Also read `CLAUDE.md` from the current working directory if it exists.
+
+### Step A3: Welcome the User
+
+Greet the User by name, summarise:
+
+- Current project phase and status from the vault note
+- The next steps recorded at the end of the last session
+- Any decisions or open questions worth flagging
+
+Keep this brief — it is an orientation, not a report.
+
+## Path B: Documentation Run (Situations 2 & 3)
+
+### Step B1: Quick Context Detection
 
 #### Detect Project Name
 
@@ -107,7 +124,7 @@ Try these methods in order:
    basename $(pwd)
    ```
 
-If none of these work or result is generic (like "src", "build", "test"), refer to step 3 below.
+If none of these work or result is generic (like "src", "build", "test"), refer to Step B2 below.
 
 #### Detect Project Area
 
@@ -122,11 +139,11 @@ MS=$(find . -maxdepth 2 -type f \( -name "*.pd" -o -name "*.maxpat" -o -name "*.
 
 Select the area using this decision logic:
 
-- If `HW > 0` AND `SW > 0`: area is ambiguous (embedded software) — refer to Step 3
+- If `HW > 0` AND `SW > 0`: area is ambiguous (embedded software) — refer to Step B2
 - Else if exactly one count is greater than all others: use that area
-- Else if all counts are zero, or no clear winner: refer to Step 3
+- Else if all counts are zero, or no clear winner: refer to Step B2
 
-If no clear match, refer to Step 3 below.
+If no clear match, refer to Step B2 below.
 
 #### Extract Description
 
@@ -135,9 +152,9 @@ Try to extract a brief description:
 1. Check if README.md exists and read first paragraph
 2. Check package.json for description field
 3. Parse the User's message for description
-4. See step 3 below if the previous steps fail.
+4. See Step B2 below if the previous steps fail.
 
-### Step 3: Ask Clarifying Questions
+### Step B2: Ask Clarifying Questions
 
 If project_name is null OR area is null, use AskUserQuestion before launching agent:
 
@@ -163,7 +180,7 @@ Options:
   - Other (custom input)
 ```
 
-### Step 4: Launch Documentation Agent
+### Step B3: Launch Documentation Agent
 
 Launch an `obsidian-project-documentation:manager` agent with a prompt that includes all of the following context variables. Every variable must be populated from the sources listed — do not leave any as empty or undefined.
 
@@ -195,7 +212,7 @@ git_enabled: {git_enabled}
 User's original message: {user_original_message}
 ```
 
-### Step 5: Report Results
+### Step B4: Report Results
 
 When the agent completes, inform the User:
 

@@ -96,7 +96,11 @@ or
 
 ## How It Works
 
-The skill uses an efficient, non-blocking architecture that works in the background. It does this by using the Obsidian Project Documentation Assistant skill to detect your project context, asks any questions upfront, then triggers the Obsidian Project Documentation Manager agent which handles the documentation work asynchronously. This means you can keep working while your notes are being updated and synced.
+The skill has two execution paths:
+
+**Session start (read-only):** When you open a project, the skill reads your vault note and `CLAUDE.md`, then briefly orients you — current phase, status, and the next steps from last time. No writes, no agent.
+
+**Documentation run:** When you ask to document, wrap up, or update notes, the skill detects project context, asks any questions upfront, then launches the documentation agent in the background. You can keep working while your notes are updated and synced.
 
 The agent also performs cross-project relationship analysis each session, scanning your vault to find genuinely related projects based on shared technologies and explicit context signals, and writes scored wiki-links into each note's frontmatter and body automatically.
 
@@ -105,11 +109,11 @@ The agent also performs cross-project relationship analysis each session, scanni
 The skill intelligently detects project context:
 
 1. **Project Name** - From git repo, directory name, or asks you
-2. **Area Classification** - Based on file extensions and patterns:
-   - **Hardware**: `.ino`, `.cpp`, `platformio.ini` (Arduino, embedded)
-   - **Software**: `.js`, `.py`, `package.json` (web, scripts)
-   - **Woodworking**: `.stl`, `.blend`, `.f3d` (CAD files)
-   - **Music Synthesis**: `.pd`, `.maxpat` (Pure Data, Max/MSP)
+2. **Area Classification** - Based on file extensions and patterns (all areas counted in parallel; clear winner wins, ties escalate to a question):
+   - **Hardware**: `.ino`, `.pcb`, `.sch`, `platformio.ini` (Arduino, embedded)
+   - **Software**: `.js`, `.ts`, `.py`, `.go`, `.rs`, `package.json`, `Cargo.toml`, `go.mod` (web, scripts, systems)
+   - **Woodworking**: `.stl`, `.blend`, `.f3d`, `.skp`, `cut-list.md` (CAD, shop files)
+   - **Music Synthesis**: `.pd`, `.maxpat`, `.syx`, `.amxd`, `patch-notes.md` (Pure Data, Max/MSP, Ableton)
 3. **Description** - Extracts from conversation or README.md
 
 ### Vault Structure

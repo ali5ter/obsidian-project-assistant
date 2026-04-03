@@ -458,6 +458,29 @@ CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plu
 7. Run `/plugin marketplace update ali5ter` in Claude Code before installing — the installer
    uses a cached catalog and will not see the new version without an explicit update.
 
+### Improvements and Bug Fixes (v3.2.0 - 2026-04-03)
+
+Six PRs addressing bugs and improvements identified in a deep review against Claude Code best practices:
+
+**Bug fixes:**
+- Removed duplicate `vca` keyword in `area-mapping.md` (#8)
+- Fixed wrong skill name in `manager.md` description (#6)
+- Standardised `GIT_REMOTE` naming in `manager.md` Step 6 (#4)
+- Replaced stale `~/.claude/skills/` template/area-mapping paths with dynamic `find` commands targeting the plugin cache (#3)
+- Added `{{time}}`, `{{phase}}`, and `{{area_tag}}` to the explicit placeholder list in `manager.md` Step 1 (#5, #16)
+
+**Architecture improvements:**
+- `SKILL.md` split into **Path A** (session-start, read-only) and **Path B** (documentation run). Path A reads vault note + CLAUDE.md and orients the user; it never launches the agent (#13)
+- Added explicit agent prompt template to `SKILL.md` Step B3, enumerating all 10 context variables and their sources (#7)
+- Replaced sequential `if/elif` area detection with parallel match-count algorithm; extension lists expanded to match `context-detection.md` (#15)
+- `manager.md` Step 4 (README/CONTRIBUTING) now has a scope guard (only runs on structural session changes), requires user confirmation before touching README.md, excludes LICENSE entirely (#14)
+
+**Agent frontmatter hardened (#9, #10, #11, #17):**
+- `tools` allowlist: `Read, Write, Edit, Bash, TodoWrite, AskUserQuestion, Glob, Grep`
+- `maxTurns: 50`
+- `background: true`
+- `permissionMode: acceptEdits`
+
 ## Important Notes
 
 - Skills execute in the context of Claude Code conversations - they're not standalone programs

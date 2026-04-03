@@ -1,7 +1,7 @@
 ---
 name: obsidian-project-documentation
 description: Document technical projects in Obsidian vault. Use when the User mentions "document this", "close out", "wrap up", "update notes", "track progress", "where are we at", or asks about project docs.
-version: 3.1.0
+version: 3.2.0
 allowed-tools: Read, Bash, AskUserQuestion, Task
 ---
 

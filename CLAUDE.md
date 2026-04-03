@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (v3.1.0) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
+This is a Claude Code plugin (v3.2.0) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
 
 **Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
@@ -46,7 +46,7 @@ When testing skill changes:
    - `plugin.json` — plugin metadata (name, version, author, keywords)
 
 2. **Skill + Agent Implementation**
-   - **Skill** (`skills/obsidian-project-documentation/SKILL.md`) - Lightweight launcher that detects context and spawns agent
+   - **Skill** (`skills/obsidian-project-documentation/SKILL.md`) - Two-path launcher: Path A orients the user (read-only, no agent), Path B detects context and spawns the manager agent
    - **Agent** (`agents/manager.md`) - Does the actual documentation work
    - **Templates** (`skills/obsidian-project-documentation/project-template.md`) - Note template with `{{placeholder}}` syntax
    - **Helpers** (`skills/obsidian-project-documentation/*.md`) - Reference documentation for context detection rules (area-mapping.md, context-detection.md)
@@ -106,10 +106,10 @@ obsidian-project-assistant/
 └── LICENSE                                        # MIT License
 ```
 
-**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code - it's a lightweight launcher that:
-1. Detects project context using bash commands
-2. Asks clarifying questions if needed (using AskUserQuestion tool)
-3. Spawns the custom "manager" agent (using Task tool) to handle the actual documentation work
+**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code — it runs one of two paths:
+
+- **Path A (session-start / orientation):** Reads the existing vault note and `CLAUDE.md`, summarises project state for the user. Never launches the agent. Used when Alister asks "where were we?" or similar.
+- **Path B (documentation run):** Detects project context using bash commands, asks clarifying questions if needed (AskUserQuestion tool), then spawns the manager agent (Task tool) to perform the documentation work.
 
 The agent file `manager.md` contains detailed instructions for creating/updating notes, handling git operations, and managing templates.
 
@@ -171,9 +171,11 @@ The skill uses a two-phase architecture for token efficiency and background exec
 ### Template Processing
 - Template is stored at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/project-template.md` (plugin framework cache location)
 - Agent reads template and performs string replacement for placeholders (simple substitution)
-- Date generated via `date +%Y-%m-%d` bash command
-- Placeholders: `{{title}}`, `{{area}}`, `{{area_tag}}`, `{{date}}`, `{{description}}`
+- Date generated via `date +%Y-%m-%d` bash command, time via `date +%H:%M`
+- Placeholders: `{{title}}`, `{{area}}`, `{{area_tag}}`, `{{date}}`, `{{time}}`, `{{phase}}`, `{{description}}`
   - `{{area_tag}}`: area value converted to lowercase with hyphens (e.g., "Music Synthesis" → "music-synthesis")
+  - `{{phase}}`: evaluated from `Planning → Implementing → Testing → Complete` progression
+  - `{{time}}`: 24-hour HH:MM timestamp for the session start
 - Template frontmatter includes `technologies: []` and `related: []` arrays populated by the agent each session
 - Template includes a "Related Projects" section maintained automatically between Overview and Goals
 - When updating existing notes, the agent appends a new Update section while preserving all user content

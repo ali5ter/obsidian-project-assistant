@@ -146,9 +146,26 @@ Use the information above to update the note in the User's Obsidian vault (appen
 
 ### 4. Create or update the Project README.md file
 
-- Make sure any appropriate updates are placed into the `README.md`.
-- Check for any update to other typical GitHub repository files, including, but not limited to, `LICENSE`, and `CONTRIBUTING.md` files.
-- Use the usual GitHub best-practices for any repository documentaion. As documentation manager this should be part of your expertise.
+**Scope guard:** Only proceed with this step if the working session included at least one of:
+
+- A new feature added or removed
+- An architectural or structural change
+- A public API or interface change
+- A change to setup, build, or usage instructions
+
+If none of the above apply, skip this step and note it in the Step 8 summary.
+
+**README.md:** If the scope guard passes, review the existing README.md and update only the sections affected by the session. Do not rewrite sections that are still accurate. Before making any changes, confirm with the User:
+
+```text
+"The session included [change summary]. Shall I update README.md to reflect this?"
+```
+
+Only proceed if the User confirms.
+
+**CONTRIBUTING.md:** Only create or update if the User explicitly requests it during this session. Do not create it speculatively.
+
+**LICENSE:** Do not modify. Licensing changes require explicit user intent and are out of scope for documentation runs.
 
 ### 5. Update AI Context files
 

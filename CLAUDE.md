@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (v3.2.0) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
+This is a Claude Code plugin (v3.2.1) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
 
 **Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
 ## Commands
 
 ### Installation (Claude Code plugin framework)
-```
+
+```text
 /plugin marketplace add ali5ter/claude-plugins
 /plugin install obsidian-project-documentation@ali5ter
 ```
@@ -19,19 +20,24 @@ This is a Claude Code plugin (v3.2.0) that automatically documents technical pro
 First trigger of the skill prompts for vault path — no separate setup step needed.
 
 ### Migration from v2.x (bash-installer users)
+
 ```bash
 git pull
 ./migrate
 ```
+
 Then run the two `/plugin` commands above.
 
 ### Uninstall
-```
+
+```text
 /plugin uninstall obsidian-project-documentation@ali5ter
 ```
 
 ### Development Workflow
+
 When testing skill changes:
+
 1. Edit files in `skills/obsidian-project-documentation/` or `agents/manager.md`
 2. Reinstall plugin locally to test
 3. Start Claude Code in a test project directory
@@ -55,6 +61,7 @@ When testing skill changes:
 ### Execution Flow (Agent-Based Architecture)
 
 When user says "document this project":
+
 1. Claude Code loads `SKILL.md` (the launcher skill)
 2. Launcher reads `config.json` to get vault path
 3. Launcher runs quick bash commands to detect project context (name from git/directory, area from file extensions)
@@ -78,6 +85,7 @@ See `skills/obsidian-project-documentation/context-detection.md` for complete de
 ### Template System
 
 Templates use double-brace placeholders:
+
 - `{{title}}` - Project name
 - `{{area}}` - Project area (Hardware/Software/etc.)
 - `{{date}}` - ISO 8601 date (YYYY-MM-DD)
@@ -87,7 +95,7 @@ When updating existing notes, the skill appends to the Progress Log section whil
 
 ## File Structure
 
-```
+```text
 obsidian-project-assistant/
 ├── .claude-plugin/
 │   └── plugin.json                                # Plugin metadata (name, version, author)
@@ -118,17 +126,20 @@ This two-phase architecture (launcher skill + custom agent) provides token effic
 ## Key Implementation Details
 
 ### Plugin Architecture (v3.0.0+)
+
 - Distributed via Claude Code native plugin framework (`/plugin marketplace add`, `/plugin install`)
 - Plugin manifest at `.claude-plugin/plugin.json` (name, version, author, keywords)
 - `install` script is deprecated — shows redirect message pointing to `/plugin` commands
 - `migrate` script handles v2.x → v3.x migration: preserves config, removes old files
 
 ### Config Location (v3.0.0+)
+
 - Config file: `~/.claude/obsidian-project-assistant-config.json`
 - Created automatically on first use by SKILL.md first-run setup (asks user for vault path)
 - Previously was at `~/.claude/skills/obsidian-project-documentation/config.json`
 
 ### Skill Invocation
+
 - Activated by keywords in user messages: "document this", "log experiment", "track progress", "update notes"
 - Launcher allowed tools: Read, Bash, AskUserQuestion, Task (defined in SKILL.md frontmatter)
 - Agent has access to all tools needed for documentation (Read, Write, Bash, etc.)
@@ -140,6 +151,7 @@ This two-phase architecture (launcher skill + custom agent) provides token effic
 The skill uses a two-phase architecture for token efficiency and background execution:
 
 **Phase 1: Launcher (SKILL.md)**
+
 - Loads configuration from `~/.claude/obsidian-project-assistant-config.json`
 - On first run (config missing): asks user for vault path via AskUserQuestion, writes config
 - Detects project context (name, area, description) using bash commands
@@ -148,6 +160,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Spawns custom agent using Task tool with subagent_type="manager"
 
 **Phase 2: Agent (Background)**
+
 - Receives complete context and instructions from launcher
 - Loads appropriate template based on task type
 - Creates or updates notes in vault
@@ -155,6 +168,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Returns summary of operations performed
 
 **Benefits:**
+
 - **Token Efficiency**: Launcher is ~200 lines vs ~800 lines in previous monolithic approach
 - **Background Execution**: Agent runs asynchronously, user can continue working
 - **Separation of Concerns**: Context detection separate from documentation work
@@ -162,6 +176,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - **Scalability**: Easy to add new documentation types without bloating launcher
 
 **Agent Prompt Structure:**
+
 - Context variables (vault path, project name, area, dates, config settings)
 - Task-specific instructions (create vs update, project vs experiment)
 - Git operation rules based on config
@@ -169,6 +184,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - Expected output format
 
 ### Template Processing
+
 - Template is stored at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/project-template.md` (plugin framework cache location)
 - Agent reads template and performs string replacement for placeholders (simple substitution)
 - Date generated via `date +%Y-%m-%d` bash command, time via `date +%H:%M`
@@ -181,6 +197,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 - When updating existing notes, the agent appends a new Update section while preserving all user content
 
 ### Git Integration
+
 - Optional: controlled by `config.json` fields `git_enabled`, `auto_commit`, and `auto_push`
 - Skill checks if vault is git repo before attempting commits
 - If `auto_push` is true, automatically pushes to remote after committing
@@ -194,6 +211,7 @@ The skill uses a two-phase architecture for token efficiency and background exec
 The agent was significantly improved to ensure reliable execution of all documentation steps, especially when documenting the tool itself (meta-documentation scenario):
 
 **Key Improvements:**
+
 - **TodoWrite Tracking**: Agent now creates a visible task list with all 7 steps at the start of execution
 - **Meta-Documentation Awareness**: Special handling when working directory contains "obsidian-project-assistant"
   - Detects self-documentation scenarios
@@ -204,12 +222,14 @@ The agent was significantly improved to ensure reliable execution of all documen
 - **Step Validation**: After critical steps (especially CLAUDE.md updates), agent re-reads files to verify changes were written correctly
 
 **Testing Approach:**
+
 - The 2025-12-31 session served as the critical test case
 - Previous session (2025-12-30 refactoring) had failed to update CLAUDE.md
 - Improvements were tested by triggering agent with "Let's wrap up this session"
 - Verified all 7 steps execute correctly including CLAUDE.md updates
 
 **Known Issues Fixed:**
+
 - Step numbering inconsistency (was 1,3-8, corrected to 1-7)
 - Silent failures when updating repository documentation
 - Missing TodoWrite visibility for users
@@ -219,12 +239,14 @@ The agent was significantly improved to ensure reliable execution of all documen
 A critical bug was discovered and fixed in the agent's Step 4 (AI Context files) logic:
 
 **The Bug:**
+
 - Agent Step 4 would only UPDATE existing CLAUDE.md files
 - If CLAUDE.md didn't exist, the agent would silently skip creation
 - This meant projects were missing AI context documentation entirely
 - The bug went undetected because the agent would report "CLAUDE.md not found" and continue to Step 5
 
 **Root Cause:**
+
 - Step 4 had a single-branch if-then logic: "if CLAUDE.md exists, update it"
 - No else branch to handle creation when file was missing
 - The CRITICAL label emphasized updating but not creating
@@ -252,11 +274,13 @@ Updated `agents/manager.md` Step 4 with comprehensive two-branch logic:
    - Prevents silent failures that skip documentation steps
 
 **Testing:**
+
 - This documentation session itself verifies the fix works
 - Agent should now create CLAUDE.md for projects currently lacking AI context files
 - Future sessions on new projects will have proper context handoff
 
 **Impact:**
+
 - Fixes significant gap where projects were missing AI context documentation
 - Improves handoff between work sessions when Claude needs project background
 - Makes agent more proactive about maintaining complete documentation set
@@ -267,6 +291,7 @@ Updated `agents/manager.md` Step 4 with comprehensive two-branch logic:
 A critical naming conflict was discovered and fixed that prevented the skill from being triggered correctly:
 
 **The Bug:**
+
 - Two different skill versions installed simultaneously with conflicting names:
   - Old v1.1.0: `~/.claude/skills/obsidian-project-assistant/` with skill name "obsidian-project-assistant"
   - Current v2.1.1: `~/.claude/skills/obsidian-project-documentation/` with skill name "obsidian-project-assistant" (INCORRECT)
@@ -275,12 +300,14 @@ A critical naming conflict was discovered and fixed that prevented the skill fro
 - Trigger phrases like "wrap this up" or "document this" failed due to ambiguity
 
 **Root Cause:**
+
 - Line 2 of `skills/obsidian-project-documentation/SKILL.md` had `name: "obsidian-project-assistant"`
 - Should have been `name: "obsidian-project-documentation"` to match directory structure
 - This created a naming conflict when both skill versions were installed
 - Old v1.1.0 installation was never properly removed during upgrade to v2.x
 
 **The Fix:**
+
 1. Updated `skills/obsidian-project-documentation/SKILL.md` frontmatter:
    - Changed name from "obsidian-project-assistant" to "obsidian-project-documentation"
    - Ensures skill name matches directory name for consistency
@@ -292,17 +319,20 @@ A critical naming conflict was discovered and fixed that prevented the skill fro
    - Verified single, unambiguous skill installation
 
 **Technical Details:**
+
 - Skill names must be unique across `~/.claude/skills/` directory
 - Claude Code matches trigger phrases to skill names from SKILL.md frontmatter
 - Ambiguous names cause invocation failures with no clear error message
 - **Best practice**: Skill name in frontmatter should match directory name for clarity and uniqueness
 
 **Testing:**
+
 - Verified only one skill installation exists in `~/.claude/skills/`
 - Confirmed frontmatter name matches directory structure
 - Skill now triggers reliably with natural language phrases
 
 **Impact:**
+
 - Fixes inability to trigger documentation skill with natural language
 - Ensures reliable skill invocation going forward
 - Eliminates confusion from multiple installed versions
@@ -328,16 +358,19 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
    - Both arrays fully rewritten each session (stale links removed automatically)
 
 **Design constraints:**
+
 - Never link to a note that does not exist in the vault
 - Do not fabricate connection reasons
 - 30-line scan limit keeps token cost bounded as vault grows
 
 **Template changes (v2.2.0):**
+
 - New frontmatter fields: `tags: [project, project/{{area_tag}}]`, `technologies: []`, `related: []`
 - New "Related Projects" section in note body (agent-maintained, between Overview and Goals)
 - "Reference Links" section now explicitly for external URLs only
 
 **Area mapping changes (v2.2.0):**
+
 - `area-mapping.md` now includes "Canonical Technology Names for Relationship Matching" section
 - Per-area lookup tables map aliases and file extensions to consistent canonical names
 
@@ -346,6 +379,7 @@ Agent Step 2 was added to build knowledge connections across the vault automatic
 Migrated distribution from bash installer to Claude Code native plugin framework:
 
 **Changes:**
+
 - `skill/` renamed → `skills/`, `agent/` renamed → `agents/` (plugin framework conventions)
 - `.claude-plugin/plugin.json` created
 - `lib/pfb` submodule removed (only served the deprecated bash installer)
@@ -355,6 +389,7 @@ Migrated distribution from bash installer to Claude Code native plugin framework
 - SKILL.md updated with first-run setup: asks user for vault path on first use (no separate install step)
 
 **User migration path:**
+
 1. `git pull && ./migrate` — preserves config, removes old files
 2. `/plugin marketplace add ali5ter/claude-plugins`
 3. `/plugin install obsidian-project-documentation@ali5ter`
@@ -386,7 +421,7 @@ The plugin's marketplace registration was migrated from a self-hosted `marketpla
 
 - Installation command updated to reference the central marketplace:
 
-  ```
+  ```text
   /plugin marketplace add ali5ter/claude-plugins
   /plugin install obsidian-project-documentation@ali5ter
   ```
@@ -403,6 +438,7 @@ The commit message for `160c943` states this file should be removed (superseded 
 Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-documentation`) is easier from a single `ali5ter/claude-plugins` repo. This mirrors the thin-catalog architecture used by `anthropics/claude-plugins-official`.
 
 ### When Modifying SKILL.md
+
 - Changes to SKILL.md affect how Claude behaves during skill execution
 - Keep bash commands exact and testable
 - Provide concrete examples for each scenario
@@ -410,6 +446,7 @@ Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-doc
 - Remember: this file is instruction text, not executable code
 
 ### When Adding New Area Types
+
 1. Add file extensions to `skills/obsidian-project-documentation/area-mapping.md`
 2. Add detection bash commands to `skills/obsidian-project-documentation/context-detection.md`
 3. Update `skills/obsidian-project-documentation/SKILL.md` detection section
@@ -417,12 +454,14 @@ Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-doc
 5. Test manually with a project containing those file types
 
 ### When Modifying Templates
+
 - Keep `{{placeholder}}` syntax consistent
 - Template is at `skills/obsidian-project-documentation/project-template.md`
 - Maintain frontmatter format (YAML between `---` markers)
 - Agent performs direct string replacement, so placeholders must match exactly
 
 ### Testing Strategy
+
 - Manual testing required for skill behavior (run Claude Code in test projects)
 - Create test projects with different file types to verify area detection
 - Test with a dedicated test vault to avoid contaminating production notes
@@ -465,6 +504,7 @@ CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plu
 Six PRs addressing bugs and improvements identified in a deep review against Claude Code best practices:
 
 **Bug fixes:**
+
 - Removed duplicate `vca` keyword in `area-mapping.md` (#8)
 - Fixed wrong skill name in `manager.md` description (#6)
 - Standardised `GIT_REMOTE` naming in `manager.md` Step 6 (#4)
@@ -472,16 +512,35 @@ Six PRs addressing bugs and improvements identified in a deep review against Cla
 - Added `{{time}}`, `{{phase}}`, and `{{area_tag}}` to the explicit placeholder list in `manager.md` Step 1 (#5, #16)
 
 **Architecture improvements:**
+
 - `SKILL.md` split into **Path A** (session-start, read-only) and **Path B** (documentation run). Path A reads vault note + CLAUDE.md and orients the user; it never launches the agent (#13)
 - Added explicit agent prompt template to `SKILL.md` Step B3, enumerating all 10 context variables and their sources (#7)
 - Replaced sequential `if/elif` area detection with parallel match-count algorithm; extension lists expanded to match `context-detection.md` (#15)
 - `manager.md` Step 4 (README/CONTRIBUTING) now has a scope guard (only runs on structural session changes), requires user confirmation before touching README.md, excludes LICENSE entirely (#14)
 
 **Agent frontmatter hardened (#9, #10, #11, #17):**
+
 - `tools` allowlist: `Read, Write, Edit, Bash, TodoWrite, AskUserQuestion, Glob, Grep`
 - `maxTurns: 50`
 - `background: true`
 - `permissionMode: acceptEdits`
+
+### Bug Fix: GIT_REMOTE Respects Intentional Deletion (v3.2.1 - 2026-04-14)
+
+Fixes #23: the agent was re-adding a `GIT_REMOTE` file to repos where it had been deliberately removed.
+
+**The Bug:**
+
+Step 6 would unconditionally create `GIT_REMOTE` if it was absent, regardless of whether it had been previously tracked and then intentionally deleted from the repo.
+
+**The Fix:**
+
+Step 6 in `agents/manager.md` now runs two guard checks before creating or updating `GIT_REMOTE`:
+
+1. **Intentional deletion check** — `git log --diff-filter=D -- GIT_REMOTE`: if any deletion commit exists, skip creation and warn the user in the Step 8 summary.
+2. **Gitignore check** — `git check-ignore -q GIT_REMOTE`: if the file is ignored, skip creation and note it in the Step 8 summary.
+
+Creation only proceeds when both checks pass (no prior deletion commit, not gitignored).
 
 ## Important Notes
 

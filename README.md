@@ -25,7 +25,7 @@ Install via the Claude Code plugin system — no cloning or bash scripts needed.
 
 Run these two commands inside Claude Code:
 
-```
+```text
 /plugin marketplace add ali5ter/claude-plugins
 /plugin install obsidian-project-documentation@ali5ter
 ```
@@ -46,7 +46,7 @@ Then install via the two `/plugin` commands above.
 
 ### Uninstall
 
-```
+```text
 /plugin uninstall obsidian-project-documentation@ali5ter
 ```
 

@@ -51,9 +51,11 @@ When activated, you will:
 - Check if note exists at: {vault_path}/Projects/{project_name}.md
 - If the Projects folder in the User's Obsidian vault doesn't exist, create it.
 - If new: Locate the template using:
+
   ```bash
   find ~/.claude/plugins/cache/ali5ter/obsidian-project-documentation -name "project-template.md" 2>/dev/null | head -1
   ```
+
   Read the file at the returned path.
 - Generate values for all placeholders before substitution:
   - `{{title}}` — project name
@@ -75,9 +77,11 @@ This step builds knowledge connections across the vault to power Obsidian's grap
 
 - Scan the working session conversation, README.md, package.json, requirements.txt, Cargo.toml, go.mod, or any other dependency/config files present in {cwd}
 - Identify canonical technology names by matching against the "Canonical Technology Names for Relationship Matching" section in `area-mapping.md`. Locate it using:
+
   ```bash
   find ~/.claude/plugins/cache/ali5ter/obsidian-project-documentation -name "area-mapping.md" 2>/dev/null | head -1
   ```
+
 - Write these to the `technologies:` frontmatter array (e.g., `technologies: [Arduino, ESP32, MQTT, I2C]`)
 - Use canonical names exactly as listed in area-mapping.md for consistency across notes
 
@@ -195,10 +199,14 @@ CRITICAL STEP - Do not skip this:
 
 If the current project is Git controlled (if `git_enabled` in the config):
 
-- Locate the project's `GIT_REMOTE` file in the repository root and create it if it is missing.
-- Determine the current Git Remote URL. If `git remote get-url origin` succeeds, use that; otherwise fall back to any `REMOTE_URL` already in the file.
-- If no Remote URL determined, prompt the User for the desired remote, configure `origin`, and record it.
-- Update `GIT_REMOTE` so it contains the lines:
+- Before creating or updating `GIT_REMOTE`, run these checks:
+  1. **Intentional deletion check:** Run `git log --diff-filter=D --pretty=format:"%H" -- GIT_REMOTE` in {cwd}. If any commit SHA is returned, the file was previously tracked and deliberately removed. In this case, **skip creation entirely** and include a warning in the Step 8 summary: "GIT_REMOTE was previously deleted from this repo — skipping to respect intentional removal."
+  2. **Gitignore check:** Run `git check-ignore -q GIT_REMOTE` in {cwd}. If exit code is 0, the file is gitignored — skip creation and note it in Step 8 summary.
+- Only proceed with creation/update if both checks pass (no prior deletion, not gitignored):
+  - Locate the project's `GIT_REMOTE` file in the repository root and create it if it is missing.
+  - Determine the current Git Remote URL. If `git remote get-url origin` succeeds, use that; otherwise fall back to any `REMOTE_URL` already in the file.
+  - If no Remote URL determined, prompt the User for the desired remote, configure `origin`, and record it.
+  - Update `GIT_REMOTE` so it contains the lines:
 
 ```text
 REMOTE_URL=<origin_url>

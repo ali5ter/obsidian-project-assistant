@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (v3.2.1) that automatically documents technical projects in Obsidian vaults. It's
+This is a Claude Code plugin (v3.2.2) that automatically documents technical projects in Obsidian vaults. It's
 distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude
 Code. No bash installer or manual file copying is needed.
 
@@ -576,6 +576,34 @@ Step 6 in `agents/manager.md` now runs two guard checks before creating or updat
    in the Step 8 summary.
 
 Creation only proceeds when both checks pass (no prior deletion commit, not gitignored).
+
+### Code Quality and Standards Audit (v3.2.2 - 2026-04-20)
+
+Ten open GitHub issues (#24–#33) were audited against the development standards in `~/.claude/CLAUDE.md`. Three
+were closed as invalid with documented reasoning; seven were fixed and released as v3.2.2.
+
+**Closed as invalid:**
+
+- **#25** — pfb deliberately removed in v3.0.0 (plugin framework migration, no bash installer). Not a regression.
+- **#28** — README files are explicitly exempt from the third-person documentation rule. No change required.
+- **#30** — Author attribution in `install` and `migrate` was already correct. No change required.
+
+**Fixed:**
+
+- **#24** — Added Google-Style header fields (author, version, date, license, dependencies, exit codes) to both
+  `install` and `migrate` scripts.
+- **#26** — Enabled MD013 line-length rule in `.markdownlint.json` at 120 characters (prose only). Previously
+  disabled entirely.
+- **#27** — Wrapped all prose lines exceeding 120 characters across `README.md`, `CLAUDE.md`,
+  `agents/manager.md`, and `skills/` files to satisfy the newly enabled MD013 rule.
+- **#29** — Added `.env`, `.idea/`, `.vscode/`, and `*.log` to `.gitignore`.
+- **#31** — Fixed typos "seemless" → "seamless" and a run-on phrase in `manager.md`; wrapped remaining long lines.
+- **#32** — Added `config.json.template` to repo root as a reference implementation documenting all supported
+  config keys, default values, and inline comments. Fills the gap left by automatic first-run config creation.
+- **#33** — Fixed typo "conicidentally" in `CLAUDE.md`; rewrote adjacent run-on paragraph for clarity.
+
+**Key files changed:** `.markdownlint.json`, `.gitignore`, `config.json.template` (new), `install`, `migrate`,
+`README.md`, `CLAUDE.md`, `agents/manager.md`, `skills/obsidian-project-documentation/SKILL.md`.
 
 ## Important Notes
 

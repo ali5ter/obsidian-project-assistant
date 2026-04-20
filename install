@@ -2,6 +2,10 @@
 # @file install
 # @brief DEPRECATED - Use the Claude Code plugin system instead.
 # @author Alister Lewis-Bowen <alister@lewis-bowen.org>
+# @version 3.2.1
+# @usage ./install
+# @dependencies bash 4+
+# @exit 0 Always exits 0 (prints redirect message)
 
 cat <<'EOF'
 The bash installer has been replaced by the Claude Code plugin system.

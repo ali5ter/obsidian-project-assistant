@@ -162,7 +162,8 @@ If user has custom areas, ask them to classify or provide detection rules.
 
 ## Canonical Technology Names for Relationship Matching
 
-When populating the `technologies:` frontmatter field or matching cross-project relationships, use these canonical names for consistency. Matching is case-insensitive; always write the canonical form listed here.
+When populating the `technologies:` frontmatter field or matching cross-project relationships, use these canonical
+names for consistency. Matching is case-insensitive; always write the canonical form listed here.
 
 ### Hardware
 

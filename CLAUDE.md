@@ -4,9 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code plugin (v3.2.1) that automatically documents technical projects in Obsidian vaults. It's distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude Code. No bash installer or manual file copying is needed.
+This is a Claude Code plugin (v3.2.1) that automatically documents technical projects in Obsidian vaults. It's
+distributed via the Claude Code native plugin framework — users install it with two `/plugin` commands in Claude
+Code. No bash installer or manual file copying is needed.
 
-**Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
+**Key Concept**: The skill acts as instructions for Claude Code to detect project context (name, area, type) from
+the working directory and spawn an agent that maintains structured Obsidian notes during conversations.
 
 ## Commands
 
@@ -52,10 +55,13 @@ When testing skill changes:
    - `plugin.json` — plugin metadata (name, version, author, keywords)
 
 2. **Skill + Agent Implementation**
-   - **Skill** (`skills/obsidian-project-documentation/SKILL.md`) - Two-path launcher: Path A orients the user (read-only, no agent), Path B detects context and spawns the manager agent
+   - **Skill** (`skills/obsidian-project-documentation/SKILL.md`) - Two-path launcher: Path A orients the user
+     (read-only, no agent), Path B detects context and spawns the manager agent
    - **Agent** (`agents/manager.md`) - Does the actual documentation work
-   - **Templates** (`skills/obsidian-project-documentation/project-template.md`) - Note template with `{{placeholder}}` syntax
-   - **Helpers** (`skills/obsidian-project-documentation/*.md`) - Reference documentation for context detection rules (area-mapping.md, context-detection.md)
+   - **Templates** (`skills/obsidian-project-documentation/project-template.md`) - Note template with
+     `{{placeholder}}` syntax
+   - **Helpers** (`skills/obsidian-project-documentation/*.md`) - Reference documentation for context detection
+     rules (area-mapping.md, context-detection.md)
    - **Config** - Written on first use to `~/.claude/obsidian-project-assistant-config.json`
 
 ### Execution Flow (Agent-Based Architecture)
@@ -77,7 +83,8 @@ When user says "document this project":
 The skill uses file patterns and bash commands to infer project metadata:
 
 - **Project Name**: Git repo name > directory name > ask user
-- **Area Classification**: File extension presence (`.ino` → Hardware, `.js` → Software, `.stl` → Woodworking, `.pd` → Music Synthesis)
+- **Area Classification**: File extension presence (`.ino` → Hardware, `.js` → Software, `.stl` → Woodworking,
+  `.pd` → Music Synthesis)
 - **Description**: Extract from README.md, package.json, or conversation
 
 See `skills/obsidian-project-documentation/context-detection.md` for complete detection rules.
@@ -114,12 +121,16 @@ obsidian-project-assistant/
 └── LICENSE                                        # MIT License
 ```
 
-**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code — it runs one of two paths:
+**Important**: The `SKILL.md` file is what Claude Code reads during skill execution. It's not executed code — it
+runs one of two paths:
 
-- **Path A (session-start / orientation):** Reads the existing vault note and `CLAUDE.md`, summarises project state for the user. Never launches the agent. Used when Alister asks "where were we?" or similar.
-- **Path B (documentation run):** Detects project context using bash commands, asks clarifying questions if needed (AskUserQuestion tool), then spawns the manager agent (Task tool) to perform the documentation work.
+- **Path A (session-start / orientation):** Reads the existing vault note and `CLAUDE.md`, summarises project
+  state for the user. Never launches the agent. Used when Alister asks "where were we?" or similar.
+- **Path B (documentation run):** Detects project context using bash commands, asks clarifying questions if
+  needed (AskUserQuestion tool), then spawns the manager agent (Task tool) to perform the documentation work.
 
-The agent file `manager.md` contains detailed instructions for creating/updating notes, handling git operations, and managing templates.
+The agent file `manager.md` contains detailed instructions for creating/updating notes, handling git operations,
+and managing templates.
 
 This two-phase architecture (launcher skill + custom agent) provides token efficiency and background execution.
 
@@ -185,7 +196,9 @@ The skill uses a two-phase architecture for token efficiency and background exec
 
 ### Template Processing
 
-- Template is stored at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/project-template.md` (plugin framework cache location)
+- Template is stored at
+  `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/project-template.md`
+  (plugin framework cache location)
 - Agent reads template and performs string replacement for placeholders (simple substitution)
 - Date generated via `date +%Y-%m-%d` bash command, time via `date +%H:%M`
 - Placeholders: `{{title}}`, `{{area}}`, `{{area_tag}}`, `{{date}}`, `{{time}}`, `{{phase}}`, `{{description}}`
@@ -208,7 +221,8 @@ The skill uses a two-phase architecture for token efficiency and background exec
 
 ### Agent Reliability Improvements (v2.1.0 - 2025-12-31)
 
-The agent was significantly improved to ensure reliable execution of all documentation steps, especially when documenting the tool itself (meta-documentation scenario):
+The agent was significantly improved to ensure reliable execution of all documentation steps, especially when
+documenting the tool itself (meta-documentation scenario):
 
 **Key Improvements:**
 
@@ -217,9 +231,11 @@ The agent was significantly improved to ensure reliable execution of all documen
   - Detects self-documentation scenarios
   - Ensures BOTH vault note AND repository's CLAUDE.md are updated
   - Step 4 is explicitly marked as CRITICAL with validation requirements
-- **Structured Reporting**: Step 7 requires reporting completion status for ALL steps with explicit explanations for any skipped steps
+- **Structured Reporting**: Step 7 requires reporting completion status for ALL steps with explicit explanations
+  for any skipped steps
 - **Error Handling Protocol**: Agent must STOP and report errors clearly instead of silently skipping steps
-- **Step Validation**: After critical steps (especially CLAUDE.md updates), agent re-reads files to verify changes were written correctly
+- **Step Validation**: After critical steps (especially CLAUDE.md updates), agent re-reads files to verify
+  changes were written correctly
 
 **Testing Approach:**
 
@@ -343,7 +359,8 @@ A critical naming conflict was discovered and fixed that prevented the skill fro
 
 Agent Step 2 was added to build knowledge connections across the vault automatically. The agent now:
 
-1. **Extracts canonical technologies** from the session conversation and dependency files (package.json, requirements.txt, etc.), matched against the lookup tables in `area-mapping.md`
+1. **Extracts canonical technologies** from the session conversation and dependency files (package.json,
+   requirements.txt, etc.), matched against the lookup tables in `area-mapping.md`
 2. **Scans existing vault notes** - reads first 30 lines of each note in `$VAULT_PATH/Projects/` (token-efficient)
 3. **Scores relationship candidates** using a points system:
    - Same `area:` value → 1 point
@@ -405,17 +422,22 @@ When installed via the Claude Code plugin framework, `subagent_type` in SKILL.md
 - Wrong: `subagent_type: manager`
 - Correct: `subagent_type: obsidian-project-documentation:manager`
 
-The namespace prefix is required in plugin-installed deployments. Bare agent names only work in development (manually placed agents). This is a framework-level requirement and must be respected in any future agent additions.
+The namespace prefix is required in plugin-installed deployments. Bare agent names only work in development
+(manually placed agents). This is a framework-level requirement and must be respected in any future agent
+additions.
 
 **Bug 2: Tag/version ordering in release workflow**
 
-The plugin framework caches the plugin using the git tag. If you tag before committing the updated version number in `plugin.json`, the cache is populated with the wrong version. Always follow the order in the "Publishing Updates" section: bump → commit → tag → push.
+The plugin framework caches the plugin using the git tag. If you tag before committing the updated version number
+in `plugin.json`, the cache is populated with the wrong version. Always follow the order in the "Publishing
+Updates" section: bump → commit → tag → push.
 
 The v3.0.1 tag was moved to the correct commit and the GitHub release was recreated.
 
 ### Central Marketplace Migration (v3.0.1 - 2026-03-18)
 
-The plugin's marketplace registration was migrated from a self-hosted `marketplace.json` inside this repository's `.claude-plugin/` directory to the central `ali5ter/claude-plugins` marketplace hosted at a dedicated GitHub repo.
+The plugin's marketplace registration was migrated from a self-hosted `marketplace.json` inside this repository's
+`.claude-plugin/` directory to the central `ali5ter/claude-plugins` marketplace hosted at a dedicated GitHub repo.
 
 **What changed:**
 
@@ -431,11 +453,15 @@ The plugin's marketplace registration was migrated from a self-hosted `marketpla
 
 **Note on `.claude-plugin/marketplace.json`:**
 
-The commit message for `160c943` states this file should be removed (superseded by the central marketplace), but the deletion was not staged. The file remains present. It can be safely deleted in a future cleanup commit — it no longer drives plugin discovery.
+The commit message for `160c943` states this file should be removed (superseded by the central marketplace), but
+the deletion was not staged. The file remains present. It can be safely deleted in a future cleanup commit — it
+no longer drives plugin discovery.
 
 **Why centralise:**
 
-Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-documentation`) is easier from a single `ali5ter/claude-plugins` repo. This mirrors the thin-catalog architecture used by `anthropics/claude-plugins-official`.
+Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-documentation`) is easier from a
+single `ali5ter/claude-plugins` repo. This mirrors the thin-catalog architecture used by
+`anthropics/claude-plugins-official`.
 
 ### When Modifying SKILL.md
 
@@ -488,7 +514,8 @@ Managing multiple plugins (e.g. `over-50s-health-advisor`, `obsidian-project-doc
 
 ### Publishing Updates
 
-CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plugin framework caches by tag, so the tag must point at the commit that already contains the updated version numbers.
+CRITICAL ORDER — bump versions and commit BEFORE creating the git tag. The plugin framework caches by tag, so
+the tag must point at the commit that already contains the updated version numbers.
 
 1. Update version in `skills/obsidian-project-documentation/SKILL.md` frontmatter
 2. Update version in `.claude-plugin/plugin.json`
@@ -508,15 +535,20 @@ Six PRs addressing bugs and improvements identified in a deep review against Cla
 - Removed duplicate `vca` keyword in `area-mapping.md` (#8)
 - Fixed wrong skill name in `manager.md` description (#6)
 - Standardised `GIT_REMOTE` naming in `manager.md` Step 6 (#4)
-- Replaced stale `~/.claude/skills/` template/area-mapping paths with dynamic `find` commands targeting the plugin cache (#3)
+- Replaced stale `~/.claude/skills/` template/area-mapping paths with dynamic `find` commands targeting the
+  plugin cache (#3)
 - Added `{{time}}`, `{{phase}}`, and `{{area_tag}}` to the explicit placeholder list in `manager.md` Step 1 (#5, #16)
 
 **Architecture improvements:**
 
-- `SKILL.md` split into **Path A** (session-start, read-only) and **Path B** (documentation run). Path A reads vault note + CLAUDE.md and orients the user; it never launches the agent (#13)
-- Added explicit agent prompt template to `SKILL.md` Step B3, enumerating all 10 context variables and their sources (#7)
-- Replaced sequential `if/elif` area detection with parallel match-count algorithm; extension lists expanded to match `context-detection.md` (#15)
-- `manager.md` Step 4 (README/CONTRIBUTING) now has a scope guard (only runs on structural session changes), requires user confirmation before touching README.md, excludes LICENSE entirely (#14)
+- `SKILL.md` split into **Path A** (session-start, read-only) and **Path B** (documentation run). Path A reads
+  vault note + CLAUDE.md and orients the user; it never launches the agent (#13)
+- Added explicit agent prompt template to `SKILL.md` Step B3, enumerating all 10 context variables and their
+  sources (#7)
+- Replaced sequential `if/elif` area detection with parallel match-count algorithm; extension lists expanded to
+  match `context-detection.md` (#15)
+- `manager.md` Step 4 (README/CONTRIBUTING) now has a scope guard (only runs on structural session changes),
+  requires user confirmation before touching README.md, excludes LICENSE entirely (#14)
 
 **Agent frontmatter hardened (#9, #10, #11, #17):**
 
@@ -531,14 +563,17 @@ Fixes #23: the agent was re-adding a `GIT_REMOTE` file to repos where it had bee
 
 **The Bug:**
 
-Step 6 would unconditionally create `GIT_REMOTE` if it was absent, regardless of whether it had been previously tracked and then intentionally deleted from the repo.
+Step 6 would unconditionally create `GIT_REMOTE` if it was absent, regardless of whether it had been previously
+tracked and then intentionally deleted from the repo.
 
 **The Fix:**
 
 Step 6 in `agents/manager.md` now runs two guard checks before creating or updating `GIT_REMOTE`:
 
-1. **Intentional deletion check** — `git log --diff-filter=D -- GIT_REMOTE`: if any deletion commit exists, skip creation and warn the user in the Step 8 summary.
-2. **Gitignore check** — `git check-ignore -q GIT_REMOTE`: if the file is ignored, skip creation and note it in the Step 8 summary.
+1. **Intentional deletion check** — `git log --diff-filter=D -- GIT_REMOTE`: if any deletion commit exists, skip
+   creation and warn the user in the Step 8 summary.
+2. **Gitignore check** — `git check-ignore -q GIT_REMOTE`: if the file is ignored, skip creation and note it
+   in the Step 8 summary.
 
 Creation only proceeds when both checks pass (no prior deletion commit, not gitignored).
 

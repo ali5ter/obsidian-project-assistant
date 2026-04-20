@@ -37,4 +37,6 @@ External references, datasheets, articles, and documentation used in this projec
 
 ### {{date}} {{time}}
 
-This titled session is appended at the end of each working session. Notes of accomplishments, key decisions, and next steps are written here. These sections provide a history of what happened in previous working sessions and evidence of where to pick up again in the next working session.
+This titled session is appended at the end of each working session. Notes of accomplishments, key decisions, and
+next steps are written here. These sections provide a history of what happened in previous working sessions and
+evidence of where to pick up again in the next working session.

@@ -4,7 +4,8 @@ A Claude Code skill that automatically triggers an agent to document your techni
 
 ## What is it?
 
-As you work on projects with Claude Code, this skill and agent captures your progress and insights into a structured Obsidian vault. No more forgetting what you tried, why you made certain decisions, or what worked and what didn't.
+As you work on projects with Claude Code, this skill and agent captures your progress and insights into a structured
+Obsidian vault. No more forgetting what you tried, why you made certain decisions, or what worked and what didn't.
 
 Perfect for makers, engineers, and tinkerers who work across multiple technical domains.
 
@@ -34,7 +35,8 @@ The first time you trigger the skill it will ask for your Obsidian vault path. N
 
 ### Upgrading from v2.x
 
-If you previously used the bash installer, run the migration script once to preserve your config and remove the old files:
+If you previously used the bash installer, run the migration script once to preserve your config and remove the old
+files:
 
 ```bash
 git clone https://github.com/ali5ter/obsidian-project-assistant.git
@@ -98,18 +100,24 @@ or
 
 The skill has two execution paths:
 
-**Session start (read-only):** When you open a project, the skill reads your vault note and `CLAUDE.md`, then briefly orients you — current phase, status, and the next steps from last time. No writes, no agent.
+**Session start (read-only):** When you open a project, the skill reads your vault note and `CLAUDE.md`, then
+briefly orients you — current phase, status, and the next steps from last time. No writes, no agent.
 
-**Documentation run:** When you ask to document, wrap up, or update notes, the skill detects project context, asks any questions upfront, then launches the documentation agent in the background. You can keep working while your notes are updated and synced.
+**Documentation run:** When you ask to document, wrap up, or update notes, the skill detects project context, asks
+any questions upfront, then launches the documentation agent in the background. You can keep working while your
+notes are updated and synced.
 
-The agent also performs cross-project relationship analysis each session, scanning your vault to find genuinely related projects based on shared technologies and explicit context signals, and writes scored wiki-links into each note's frontmatter and body automatically.
+The agent also performs cross-project relationship analysis each session, scanning your vault to find genuinely
+related projects based on shared technologies and explicit context signals, and writes scored wiki-links into each
+note's frontmatter and body automatically.
 
 ### Context Detection
 
 The skill intelligently detects project context:
 
 1. **Project Name** - From git repo, directory name, or asks you
-2. **Area Classification** - Based on file extensions and patterns (all areas counted in parallel; clear winner wins, ties escalate to a question):
+2. **Area Classification** - Based on file extensions and patterns (all areas counted in parallel; clear winner
+   wins, ties escalate to a question):
    - **Hardware**: `.ino`, `.pcb`, `.sch`, `platformio.ini` (Arduino, embedded)
    - **Software**: `.js`, `.ts`, `.py`, `.go`, `.rs`, `package.json`, `Cargo.toml`, `go.mod` (web, scripts, systems)
    - **Woodworking**: `.stl`, `.blend`, `.f3d`, `.skp`, `cut-list.md` (CAD, shop files)
@@ -118,7 +126,9 @@ The skill intelligently detects project context:
 
 ### Vault Structure
 
-Any project notes will be placed into a `Projects` directory in your Obsidian Vault folder. If you already use a Vault, no other folders will be touched. If you already use a Project folder in your existing Obsidian Vault, unless a notes file using the same name the Obsidian Project Documentation Manager agent wants to use, there will be no changes to existing content. If, conicidentally, there is a file with the name the Obsidian Project Documentation Manager agent wants to use, project updates will be appended to it.
+Project notes are placed into a `Projects` directory in your Obsidian vault. No other folders are touched. If a
+`Projects` folder already exists, only files managed by this skill are modified. If a note with the same name already
+exists, project updates are appended to it rather than overwriting existing content.
 
 ## Configuration
 
@@ -166,11 +176,15 @@ Edit `~/.claude/obsidian-project-assistant-config.json`:
 }
 ```
 
-Update the `area-mapping.md` and `context-detection.md` files in the plugin cache at `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/` to help detect the custom area.
+Update the `area-mapping.md` and `context-detection.md` files in the plugin cache at
+`~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/`
+to help detect the custom area.
 
 ### Custom Template
 
-The project note template used by the agent is located at `project-template.md` inside the plugin cache directory `~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/`. You can edit this file directly to customize the structure and content of your project notes.
+The project note template used by the agent is located at `project-template.md` inside the plugin cache directory
+`~/.claude/plugins/cache/ali5ter/obsidian-project-documentation/<version>/skills/obsidian-project-documentation/`.
+You can edit this file directly to customize the structure and content of your project notes.
 
 ## Troubleshooting
 

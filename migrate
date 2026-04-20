@@ -2,6 +2,10 @@
 # @file migrate
 # @brief Migrate from bash-installer-based v2.x to plugin framework v3.x
 # @author Alister Lewis-Bowen <alister@lewis-bowen.org>
+# @version 3.2.1
+# @usage ./migrate
+# @dependencies bash 4+
+# @exit 0 Success (migration complete or nothing to migrate)
 
 set -euo pipefail
 

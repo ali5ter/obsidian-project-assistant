@@ -7,9 +7,11 @@ allowed-tools: Read, Bash, AskUserQuestion, Task
 
 # Obsidian Project Documentation Assistant
 
-This skill helps maintain project documentation in an Obsidian vault while working with Claude Code. It automatically captures project progress and insights into structured, consistent notes.
+This skill helps maintain project documentation in an Obsidian vault while working with Claude Code. It
+automatically captures project progress and insights into structured, consistent notes.
 
-**Architecture:** This skill acts as a lightweight launcher that detects project context, asks clarifying questions if needed, then launches an agent to handle the documentation work in the background.
+**Architecture:** This skill acts as a lightweight launcher that detects project context, asks clarifying
+questions if needed, then launches an agent to handle the documentation work in the background.
 
 ## How This Works
 
@@ -128,7 +130,8 @@ If none of these work or result is generic (like "src", "build", "test"), refer 
 
 #### Detect Project Area
 
-Run all four area detections in parallel and count matches. This avoids the false positives of a sequential if/elif chain where the first match wins regardless of signal strength.
+Run all four area detections in parallel and count matches. This avoids the false positives of a sequential
+if/elif chain where the first match wins regardless of signal strength.
 
 ```bash
 HW=$(find . -maxdepth 2 -type f \( -name "*.ino" -o -name "*.pcb" -o -name "*.sch" -o -name "platformio.ini" -o -name "arduino_secrets.h" \) 2>/dev/null | wc -l)
@@ -182,7 +185,8 @@ Options:
 
 ### Step B3: Launch Documentation Agent
 
-Launch an `obsidian-project-documentation:manager` agent with a prompt that includes all of the following context variables. Every variable must be populated from the sources listed — do not leave any as empty or undefined.
+Launch an `obsidian-project-documentation:manager` agent with a prompt that includes all of the following context
+variables. Every variable must be populated from the sources listed — do not leave any as empty or undefined.
 
 | Variable | Source |
 | -------- | ------ |
@@ -237,4 +241,5 @@ If errors occur:
 - Use absolute paths for all file operations.
 - Use the current date for all timestamp operations.
 - Handle errors gracefully (missing templates, git failures, etc.).
-- When refering to the User, use their name and not 'User'. If in any doubt of the User's pronouns, ask the User but always remember them.
+- When refering to the User, use their name and not 'User'. If in any doubt of the User's pronouns, ask the
+  User but always remember them.
